@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { NotionFace } from "@/components/Doodles";
 import { site } from "@/content/site";
 
 export function SiteFooter() {
   return (
     <footer className="relative z-10 border-t border-border">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-5 py-8 text-sm text-subtle sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <p>
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm font-semibold text-subtle sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <p className="inline-flex items-center gap-2">
+          <NotionFace className="h-5 w-5" />
           © {new Date().getFullYear()} {site.name}
         </p>
         <div className="flex gap-5">

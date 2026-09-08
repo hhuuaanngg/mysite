@@ -7,8 +7,8 @@ export function WorkGrid() {
   const others = getOtherProjects();
 
   return (
-    <section id="work" className="scroll-mt-20 border-t border-border">
-      <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8 sm:py-24">
+    <section id="work" className="scroll-mt-20">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <SectionHeading
           eyebrow="01 / 作品"
           title="精选项目"

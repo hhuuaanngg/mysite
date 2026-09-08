@@ -32,10 +32,10 @@ export function CopyEmail({ email }: { email: string }) {
       type="button"
       onClick={copy}
       aria-live="polite"
-      className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+      className={`rounded-full border px-3 py-1 text-xs font-bold transition-colors ${
         copied
-          ? "border-accent text-accent"
-          : "border-border text-muted hover:border-border-strong hover:text-foreground"
+          ? "border-foreground bg-foreground text-accent-fg"
+          : "border-foreground/20 bg-card text-muted hover:border-foreground hover:text-foreground"
       }`}
     >
       {copied ? "已复制" : "复制"}

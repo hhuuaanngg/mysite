@@ -48,9 +48,9 @@ export const projects: Project[] = [
     repo: "https://github.com/hhuuaanngg/remote-frpc3",
     cover: {
       mark: "fr",
-      from: "#1e1b4b",
-      to: "#0b1220",
-      accent: "#a5b4fc",
+      from: "#fde8d8",
+      to: "#f7c9b4",
+      accent: "#c4552a",
     },
   },
   {
@@ -72,9 +72,9 @@ export const projects: Project[] = [
     repo: "https://github.com/hhuuaanngg/blog-hjy-me",
     cover: {
       mark: "hjy",
-      from: "#0f172a",
-      to: "#14532d",
-      accent: "#86efac",
+      from: "#d8f3ea",
+      to: "#b7e4d4",
+      accent: "#0f7b6c",
     },
   },
   {
@@ -95,9 +95,9 @@ export const projects: Project[] = [
     repo: "https://github.com/hhuuaanngg/Champiere",
     cover: {
       mark: "ch",
-      from: "#1c1917",
-      to: "#431407",
-      accent: "#fdba74",
+      from: "#fff3d6",
+      to: "#ffe08a",
+      accent: "#c19100",
     },
   },
   {
@@ -118,9 +118,9 @@ export const projects: Project[] = [
     repo: "https://github.com/hhuuaanngg/damowang.net",
     cover: {
       mark: "dw",
-      from: "#082f49",
-      to: "#0c0a09",
-      accent: "#7dd3fc",
+      from: "#d6eaf8",
+      to: "#b7d8f5",
+      accent: "#2383e2",
     },
   },
   {
@@ -140,9 +140,9 @@ export const projects: Project[] = [
     repo: "https://github.com/hhuuaanngg/NetAssistant",
     cover: {
       mark: "na",
-      from: "#134e4a",
-      to: "#111827",
-      accent: "#5eead4",
+      from: "#e8f4d8",
+      to: "#cfe8b4",
+      accent: "#4d7c0f",
     },
   },
 ];

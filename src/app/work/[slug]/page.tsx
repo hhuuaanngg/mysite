@@ -42,18 +42,18 @@ export default async function WorkPage({ params }: WorkPageProps) {
   }
 
   return (
-    <article className="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8 sm:py-16">
-      <p className="font-mono text-xs text-subtle">
+    <article className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+      <p className="text-sm font-bold text-subtle">
         <Link href="/#work" className="hover:text-foreground">
           ← 作品
         </Link>
       </p>
 
       <header className="mt-8 max-w-3xl">
-        <p className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
+        <p className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
           {project.year}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
           {project.title}
         </h1>
         <p className="mt-4 max-w-[65ch] text-lg leading-8 text-muted">
@@ -61,20 +61,20 @@ export default async function WorkPage({ params }: WorkPageProps) {
         </p>
       </header>
 
-      <div className="mt-10 overflow-hidden rounded-xl border border-border">
+      <div className="mt-10 overflow-hidden rounded-3xl border border-border paper-shadow">
         <ProjectCover project={project} size="hero" />
       </div>
 
       <div className="mt-12 grid gap-12 md:grid-cols-[minmax(0,1fr)_16rem]">
         <div className="max-w-[65ch] space-y-10">
           <section>
-            <h2 className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
+            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
               问题
             </h2>
             <p className="mt-3 text-base leading-7 text-muted">{project.problem}</p>
           </section>
           <section>
-            <h2 className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
+            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
               方案
             </h2>
             <p className="mt-3 text-base leading-7 text-muted">
@@ -82,7 +82,7 @@ export default async function WorkPage({ params }: WorkPageProps) {
             </p>
           </section>
           <section>
-            <h2 className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
+            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
               技术要点
             </h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-muted">
@@ -93,11 +93,11 @@ export default async function WorkPage({ params }: WorkPageProps) {
           </section>
         </div>
 
-        <aside className="h-fit rounded-xl border border-border bg-card p-5">
-          <h2 className="font-mono text-xs tracking-[0.18em] text-subtle uppercase">
+        <aside className="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
+          <h2 className="text-xs font-extrabold tracking-wide text-subtle uppercase">
             链接与栈
           </h2>
-          <ul className="mt-4 space-y-3 text-sm">
+          <ul className="mt-4 space-y-3 text-sm font-bold">
             {project.repo ? (
               <li>
                 <a
@@ -127,7 +127,7 @@ export default async function WorkPage({ params }: WorkPageProps) {
             {project.stack.map((tag) => (
               <li
                 key={tag}
-                className="rounded-md border border-border px-2 py-0.5 font-mono text-[11px] text-subtle"
+                className="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-[11px] text-subtle"
               >
                 {tag}
               </li>

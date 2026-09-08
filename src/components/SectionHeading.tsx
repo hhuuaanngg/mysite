@@ -9,10 +9,10 @@ export function SectionHeading({
 }) {
   return (
     <div className="max-w-2xl">
-      <p className="font-mono text-xs tracking-[0.18em] text-accent uppercase">
+      <p className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide text-foreground">
         {eyebrow}
       </p>
-      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+      <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
         {title}
       </h2>
       {description ? (

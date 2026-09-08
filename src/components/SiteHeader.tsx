@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
 
 export function SiteHeader() {
@@ -28,20 +29,21 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-50 border-b transition-colors duration-200 ${
         scrolled || open
-          ? "border-border bg-background/80 backdrop-blur-md"
+          ? "border-border bg-background/85 backdrop-blur-md"
           : "border-transparent bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-5 sm:h-16 sm:px-8">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
         <Link
           href="/"
-          className="font-mono text-sm tracking-tight text-foreground transition-colors hover:text-accent"
+          className="inline-flex items-center gap-2 text-sm font-extrabold tracking-tight text-foreground"
         >
+          <NotionFace className="h-7 w-7" />
           {site.shortName}
         </Link>
 
         <nav
-          className="hidden items-center gap-7 text-sm text-muted md:flex"
+          className="hidden items-center gap-1 text-sm font-semibold text-muted md:flex"
           aria-label="主导航"
         >
           {nav.map((item) =>
@@ -51,7 +53,7 @@ export function SiteHeader() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-colors hover:text-foreground"
+                className="rounded-full px-3 py-1.5 transition-colors hover:bg-card hover:text-foreground"
               >
                 {item.label}
               </a>
@@ -59,7 +61,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="transition-colors hover:text-foreground"
+                className="rounded-full px-3 py-1.5 transition-colors hover:bg-card hover:text-foreground"
               >
                 {item.label}
               </Link>
@@ -69,7 +71,7 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="inline-flex h-9 items-center rounded-md border border-border px-3 text-sm text-muted md:hidden"
+          className="inline-flex h-9 items-center rounded-full border border-border bg-card px-3 text-sm font-semibold text-muted md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           onClick={() => setOpen((value) => !value)}
@@ -81,7 +83,7 @@ export function SiteHeader() {
       {open ? (
         <nav
           id="mobile-nav"
-          className="border-t border-border px-5 py-3 md:hidden"
+          className="border-t border-border bg-background/95 px-5 py-3 md:hidden"
           aria-label="移动导航"
         >
           <ul className="flex flex-col gap-1">
@@ -92,7 +94,7 @@ export function SiteHeader() {
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-md px-2 py-2 text-sm text-muted hover:bg-card hover:text-foreground"
+                    className="block rounded-xl px-2 py-2 text-sm font-semibold text-muted hover:bg-card hover:text-foreground"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
@@ -100,7 +102,7 @@ export function SiteHeader() {
                 ) : (
                   <Link
                     href={item.href}
-                    className="block rounded-md px-2 py-2 text-sm text-muted hover:bg-card hover:text-foreground"
+                    className="block rounded-xl px-2 py-2 text-sm font-semibold text-muted hover:bg-card hover:text-foreground"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}

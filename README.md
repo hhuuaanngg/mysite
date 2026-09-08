@@ -1,6 +1,6 @@
 # mysite
 
-Joey Huang 的个人作品集。深色极简，中文正文，项目详情写在 `/work/[slug]`。
+Joey Huang 的个人作品集。浅色 Notion 卡通风，格子纸背景，项目详情写在 `/work/[slug]`。
 
 博客仍在 [blog.hjy.me](https://blog.hjy.me)，本仓库只做主站。
 
