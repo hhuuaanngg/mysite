@@ -12,13 +12,9 @@ export const site = {
     label: "GitHub",
     href: "https://github.com/hhuuaanngg",
   },
-  blog: {
-    label: "博客",
-    href: "https://blog.hjy.me",
-  },
   about: [
     "我更愿意把时间花在能反复用的工具上：配置要看得见、状态要说得清、部署要自己跑得通。",
-    "技术栈以 TypeScript 为主，桌面端用 Tauri，站点用 Next.js。作品和文章都放在这个站，长文仍在 blog.hjy.me。",
+    "技术栈以 TypeScript 为主，桌面端用 Tauri，站点用 Next.js。作品和文章都写在这个站上。",
   ],
 } as const;
 
@@ -37,16 +33,7 @@ export const socials = [
     href: "https://github.com/hhuuaanngg",
     description: "仓库、代码，和正在做的东西。",
     tint: "#fde8d8",
-    icon: "github",
-  },
-  {
-    id: "blog",
-    label: "博客",
-    handle: "blog.hjy.me",
-    href: "https://blog.hjy.me",
-    description: "文章全文写在这边，按日期翻。",
-    tint: "#d8f3ea",
-    icon: "blog",
+    icon: "github" as const,
   },
   {
     id: "email",
@@ -55,7 +42,7 @@ export const socials = [
     href: "mailto:hhuuaanngg2020@gmail.com",
     description: "有事直接写信，比表单快。",
     tint: "#fff4b8",
-    icon: "email",
+    icon: "email" as const,
     copy: true,
   },
 ] as const;

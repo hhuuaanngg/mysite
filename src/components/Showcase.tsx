@@ -18,7 +18,7 @@ const copy = {
   },
   articles: {
     title: "最近在写",
-    description: "摄影、生活和做过的主题。点进去是全文，仍在 blog.hjy.me。",
+    description: "摄影、生活和做过的主题。全文都在这个站上。",
   },
 } as const;
 

@@ -57,18 +57,17 @@ export const projects: Project[] = [
     slug: "blog-hjy-me",
     title: "个人博客",
     year: "2026",
-    summary: "Markdown 驱动的个人博客，部署在 blog.hjy.me。",
+    summary: "以前的独立写作站，用 Markdown 生成页面。文章已经迁到这个站。",
     problem:
       "旧文散落在 WordPress 和静态页里，写作和部署不在同一条链路上，改主题或迁域名都要重做一遍。",
     solution:
-      "用 Next.js App Router 读本地 Markdown，构建时生成页面；支持从 WordPress feed 导入，评论交给 Giscus。",
+      "用 Next.js App Router 读本地 Markdown，构建时生成页面；支持从 WordPress feed 导入，评论交给 Giscus。文章现已收进本站。",
     highlights: [
       "Markdown + front matter，文章和站点配置分开",
       "可从 WordPress feed 导入历史文章",
-      "Giscus 评论，部署在 blog.hjy.me",
+      "正文已迁入本站 /articles",
     ],
     stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Markdown"],
-    url: "https://blog.hjy.me",
     repo: "https://github.com/hhuuaanngg/blog-hjy-me",
     cover: {
       mark: "hjy",

@@ -1,14 +1,16 @@
+export type ArticleBlock =
+  | { type: "p"; text: string }
+  | { type: "quote"; text: string }
+  | { type: "img"; src: string; alt: string };
+
 export type Article = {
   slug: string;
   title: string;
   date: string;
   category: string;
   summary: string;
-  href: string;
   cover: string;
 };
-
-const blog = (slug: string) => `https://blog.hjy.me/${slug}/`;
 
 export const articles: Article[] = [
   {
@@ -17,7 +19,6 @@ export const articles: Article[] = [
     date: "2026-01-28",
     category: "摄影",
     summary: "海边一组照片。沙、水和傍晚的光。",
-    href: blog("goldencoast"),
     cover: "/articles/goldencoast.jpg",
   },
   {
@@ -26,7 +27,6 @@ export const articles: Article[] = [
     date: "2023-11-15",
     category: "摄影",
     summary: "上海的一场五月天。开场嘉宾，然后是整晚的合唱。",
-    href: blog("mayday-in-shanghai"),
     cover: "/articles/mayday-in-shanghai.jpg",
   },
   {
@@ -35,7 +35,6 @@ export const articles: Article[] = [
     date: "2023-10-30",
     category: "摄影",
     summary: "街道很吵的时候，角落里仍有一段段被定格的安静。",
-    href: blog("behind-the-bustling"),
     cover: "/articles/behind-the-bustling.jpg",
   },
   {
@@ -44,7 +43,6 @@ export const articles: Article[] = [
     date: "2023-10-29",
     category: "摄影",
     summary: "唯有美食与爱不可辜负。",
-    href: blog("food-and-love"),
     cover: "/articles/food-and-love.jpg",
   },
   {
@@ -53,7 +51,6 @@ export const articles: Article[] = [
     date: "2023-10-18",
     category: "生活",
     summary: "上海的一段日常，用照片记下路过的地方。",
-    href: blog("shanghai-2"),
     cover: "/articles/shanghai-2.jpg",
   },
   {
@@ -62,7 +59,6 @@ export const articles: Article[] = [
     date: "2023-04-05",
     category: "摄影",
     summary: "猫，和一点夜里的光。",
-    href: blog("cat-moon"),
     cover: "/articles/cat-moon.jpg",
   },
   {
@@ -71,7 +67,6 @@ export const articles: Article[] = [
     date: "2023-04-01",
     category: "摄影",
     summary: "一块蛋糕，拍完再吃。",
-    href: blog("would-you-like-a-piece-of-cake"),
     cover: "/articles/would-you-like-a-piece-of-cake.jpg",
   },
   {
@@ -80,7 +75,6 @@ export const articles: Article[] = [
     date: "2022-09-26",
     category: "摄影",
     summary: "夏天的海边，太阳往下落的那一会儿。",
-    href: blog("summer-beach-sunset"),
     cover: "/articles/summer-beach-sunset.jpg",
   },
   {
@@ -89,7 +83,6 @@ export const articles: Article[] = [
     date: "2021-07-02",
     category: "摄影",
     summary: "起雾了，快下雨了，那就快点起飞吧。云雾里看雨从天上落下。",
-    href: blog("mountain"),
     cover: "/articles/mountain.jpg",
   },
   {
@@ -98,7 +91,6 @@ export const articles: Article[] = [
     date: "2020-04-14",
     category: "主题",
     summary: "想了几年，做了两天。给技术站用的主题，先发了个 alpha。",
-    href: blog("wordpress-theme-iplay"),
     cover: "/articles/wordpress-theme-iplay.jpg",
   },
   {
@@ -107,7 +99,6 @@ export const articles: Article[] = [
     date: "2020-03-15",
     category: "生活",
     summary: "换掉用了一年的 2012 款之后，拍了几张新电脑的开箱。",
-    href: blog("macbook-pro-16-open-box"),
     cover: "/articles/macbook-pro-16-open-box.jpg",
   },
   {
@@ -116,11 +107,14 @@ export const articles: Article[] = [
     date: "2020-03-05",
     category: "摄影",
     summary: "厂房、机器和还没离开的温度。",
-    href: blog("manufacturing"),
     cover: "/articles/manufacturing.jpg",
   },
 ];
 
 export function getArticles(): Article[] {
   return articles;
+}
+
+export function getArticle(slug: string): Article | undefined {
+  return articles.find((article) => article.slug === slug);
 }

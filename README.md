@@ -2,7 +2,7 @@
 
 Joey Huang 的个人站点。浅色 Notion 卡通风，格子纸背景。
 
-页面结构：作品、文章、关于、联系。项目详情在 `/work/[slug]`，文章全文外链到 [blog.hjy.me](https://blog.hjy.me)。
+页面结构：作品、文章、关于、联系。项目详情在 `/work/[slug]`，文章详情在 `/articles/[slug]`。
 
 ## 本地运行
 
@@ -21,4 +21,4 @@ npm run dev
 npm run build
 ```
 
-改姓名、社交账号、项目和文章列表：编辑 `src/content/site.ts`、`src/content/projects.ts` 与 `src/content/articles.ts`。
+改姓名、社交账号、项目和文章列表：编辑 `src/content/site.ts`、`src/content/projects.ts` 与 `src/content/articles.ts`。文章正文在 `src/content/article-blocks.json`。

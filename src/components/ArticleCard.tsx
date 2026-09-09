@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Article } from "@/content/articles";
 
 function formatDate(value: string) {
@@ -7,13 +8,11 @@ function formatDate(value: string) {
 
 export function ArticleCard({ article }: { article: Article }) {
   return (
-    <a
-      href={article.href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`/articles/${article.slug}`}
       className="group flex h-full min-h-[9.5rem] flex-row overflow-hidden rounded-3xl border border-border bg-card paper-shadow transition-transform duration-200 hover:-translate-y-1"
     >
-      <div className="relative w-[7.25rem] shrink-0 self-stretch min-h-[9.5rem] sm:w-36 md:w-40">
+      <div className="relative w-[7.25rem] min-h-[9.5rem] shrink-0 self-stretch sm:w-36 md:w-40">
         <Image
           src={article.cover}
           alt=""
@@ -37,8 +36,8 @@ export function ArticleCard({ article }: { article: Article }) {
         <p className="line-clamp-2 text-sm leading-6 text-muted">
           {article.summary}
         </p>
-        <span className="text-sm font-bold text-accent">阅读全文 ↗</span>
+        <span className="text-sm font-bold text-accent">阅读全文</span>
       </div>
-    </a>
+    </Link>
   );
 }
