@@ -15,7 +15,7 @@
   --yellow: #f5df4d;
   --blue: #2383e2;
   --green: #0f7b6c;
-  --grid: rgb(55 53 47 / 0.09);
+  --grid: rgb(55 53 47 / 0.05);
 }
 
 @theme inline {
