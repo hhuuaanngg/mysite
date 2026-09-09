@@ -44,16 +44,25 @@ export function Showcase() {
 
     const onClick = (event: MouseEvent) => {
       const target = (event.target as HTMLElement | null)?.closest("a");
-      const href = target?.getAttribute("href");
-      if (!href) return;
-      if (href.endsWith("#articles")) setTab("articles");
-      if (href.endsWith("#work")) setTab("work");
+      if (!target) return;
+      const href = target.getAttribute("href") ?? target.href ?? "";
+      if (href.includes("#articles")) {
+        setTab("articles");
+        if (window.location.hash !== "#articles") {
+          history.replaceState(null, "", "#articles");
+        }
+      } else if (href.includes("#work")) {
+        setTab("work");
+        if (window.location.hash !== "#work") {
+          history.replaceState(null, "", "#work");
+        }
+      }
     };
 
-    document.addEventListener("click", onClick);
+    document.addEventListener("click", onClick, true);
     return () => {
       window.removeEventListener("hashchange", apply);
-      document.removeEventListener("click", onClick);
+      document.removeEventListener("click", onClick, true);
     };
   }, []);
 
