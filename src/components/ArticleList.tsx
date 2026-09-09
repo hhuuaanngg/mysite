@@ -2,17 +2,19 @@
 
 import { ArticleCard } from "@/components/ArticleCard";
 import { Pagination } from "@/components/Pagination";
-import { getArticles } from "@/content/articles";
+import type { Article } from "@/lib/article-types";
 import { ARTICLE_PAGE_SIZE, paginate } from "@/lib/pagination";
 
 export function ArticleList({
+  articles,
   page,
   onPageChange,
 }: {
+  articles: Article[];
   page: number;
   onPageChange: (page: number) => void;
 }) {
-  const { items, totalPages } = paginate(getArticles(), page, ARTICLE_PAGE_SIZE);
+  const { items, totalPages } = paginate(articles, page, ARTICLE_PAGE_SIZE);
 
   function goTo(next: number) {
     onPageChange(next);

@@ -59,7 +59,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           跳到正文
         </a>
-        <SiteHeader />
+        <SiteHeader
+          studioHref={
+            process.env.NODE_ENV === "development"
+              ? "http://127.0.0.1:8787"
+              : undefined
+          }
+        />
         <div id="content" className="relative z-10 flex flex-1 flex-col">
           {children}
         </div>

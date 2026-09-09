@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
 
-export function SiteHeader() {
+export function SiteHeader({ studioHref }: { studioHref?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -55,6 +55,16 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          {studioHref ? (
+            <a
+              href={studioHref}
+              className="ml-1 rounded-full bg-yellow px-3 py-1.5 text-sm font-extrabold text-foreground"
+              target="_blank"
+              rel="noreferrer"
+            >
+              写文章
+            </a>
+          ) : null}
         </nav>
 
         <button
@@ -86,6 +96,18 @@ export function SiteHeader() {
                 </Link>
               </li>
             ))}
+            {studioHref ? (
+              <li>
+                <a
+                  href={studioHref}
+                  className="block rounded-xl px-2 py-2 text-sm font-extrabold text-foreground"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  写文章
+                </a>
+              </li>
+            ) : null}
           </ul>
         </nav>
       ) : null}
