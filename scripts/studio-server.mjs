@@ -24,6 +24,7 @@ const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
@@ -180,6 +181,14 @@ export function createStudioServer({
         }
         send(res, 200, fs.readFileSync(target), {
           "Content-Type": MIME[path.extname(target).toLowerCase()] || "application/octet-stream",
+        });
+        return;
+      }
+
+      if (method === "GET" && url.pathname === "/vendor/marked.esm.js") {
+        const file = path.join(ROOT, "node_modules/marked/lib/marked.esm.js");
+        send(res, 200, fs.readFileSync(file), {
+          "Content-Type": "text/javascript; charset=utf-8",
         });
         return;
       }

@@ -94,9 +94,9 @@ h1 {
 
 .layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 24px;
-  max-width: 1120px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 24px;
 }
@@ -242,7 +242,171 @@ textarea {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
-  resize: vertical;
+  resize: none;
+  min-height: 0;
+  flex: 1;
+}
+
+.body-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.body-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolbar button {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.toolbar button:hover,
+.toolbar button:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 460px;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 460px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pane-label {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--subtle);
+  background: #f7f6f3;
+  border-bottom: 1px solid var(--border);
+}
+
+.pane textarea,
+.preview {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  min-height: 400px;
+}
+
+.preview {
+  overflow: auto;
+  padding: 16px 18px 24px;
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.preview:empty::before {
+  content: "左边写，右边看效果。";
+  color: var(--subtle);
+}
+
+.preview > *:first-child {
+  margin-top: 0;
+}
+
+.preview p,
+.preview li {
+  max-width: 65ch;
+}
+
+.preview h1,
+.preview h2,
+.preview h3 {
+  color: var(--foreground);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 1.2em 0 0.5em;
+}
+
+.preview h2 {
+  font-size: 1.25rem;
+}
+
+.preview h3 {
+  font-size: 1.1rem;
+}
+
+.preview blockquote {
+  margin: 1em 0;
+  border-left: 4px solid var(--yellow);
+  background: #f7f6f3;
+  padding: 10px 16px;
+  color: var(--muted);
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: #f7f6f3;
+}
+
+.preview a {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.preview code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: #f7f6f3;
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+}
+
+.preview pre {
+  overflow-x: auto;
+  background: #f7f6f3;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.preview pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.preview ul,
+.preview ol {
+  padding-left: 1.3em;
 }
 
 .check {
@@ -348,7 +512,13 @@ textarea {
   .layout,
   .row,
   .row.three,
-  .media {
+  .media,
+  .split {
     grid-template-columns: 1fr;
+  }
+
+  .split,
+  .pane {
+    min-height: 280px;
   }
 }

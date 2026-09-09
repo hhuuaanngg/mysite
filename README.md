@@ -23,7 +23,7 @@ npm run build
 
 ## 新增 / 编辑文章
 
-本机可视化：打开工坊 → 填标题、slug、摘要 → 拖封面和相册 → 写正文 → **保存到仓库**。会生成：
+本机可视化：打开工坊 → 填标题、slug、摘要 → 拖封面和相册 → 用工具栏写正文（左原文、右预览）→ **保存到仓库**。会生成：
 
 - `src/content/articles/<slug>.md`
 - `public/articles/<slug>.jpg`

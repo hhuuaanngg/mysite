@@ -1,3 +1,11 @@
+import { marked } from "/vendor/marked.esm.js";
+import {
+  applyHeading,
+  insertSnippet,
+  toggleLinePrefix,
+  wrapSelection,
+} from "./format.mjs";
+
 const form = document.querySelector("#form");
 const listEl = document.querySelector("#article-list");
 const titleEl = document.querySelector("#title");
@@ -6,6 +14,7 @@ const categoryEl = document.querySelector("#category");
 const dateEl = document.querySelector("#date");
 const summaryEl = document.querySelector("#summary");
 const bodyEl = document.querySelector("#body");
+const previewEl = document.querySelector("#preview");
 const allowEmptyEl = document.querySelector("#allow-empty");
 const statusEl = document.querySelector("#status");
 const previewLink = document.querySelector("#preview-link");
@@ -13,6 +22,36 @@ const deleteBtn = document.querySelector("#delete-btn");
 const coverPreview = document.querySelector("#cover-preview");
 const coverCopy = document.querySelector("#cover-copy");
 const galleryList = document.querySelector("#gallery-list");
+const inlineImageInput = document.querySelector("#inline-image-input");
+
+const ALLOWED_TAGS = new Set([
+  "P",
+  "BR",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "BLOCKQUOTE",
+  "UL",
+  "OL",
+  "LI",
+  "A",
+  "IMG",
+  "STRONG",
+  "EM",
+  "CODE",
+  "PRE",
+  "HR",
+  "TABLE",
+  "THEAD",
+  "TBODY",
+  "TR",
+  "TH",
+  "TD",
+  "DEL",
+  "FIGURE",
+  "FIGCAPTION",
+]);
 
 const state = {
   previousSlug: "",
@@ -60,6 +99,48 @@ function parseImages(markdown) {
   }));
 }
 
+function sanitizePreview(root) {
+  for (const el of [...root.querySelectorAll("*")]) {
+    if (!ALLOWED_TAGS.has(el.tagName)) {
+      el.replaceWith(...el.childNodes);
+      continue;
+    }
+    for (const attr of [...el.attributes]) {
+      const name = attr.name.toLowerCase();
+      if (name.startsWith("on") || name === "srcdoc") el.removeAttribute(attr.name);
+      if (el.tagName === "A" && name === "href" && /^\s*javascript:/i.test(attr.value)) {
+        el.removeAttribute("href");
+      }
+      if (el.tagName === "IMG" && name !== "src" && name !== "alt" && name !== "title") {
+        el.removeAttribute(attr.name);
+      }
+    }
+    if (el.tagName === "IMG") {
+      el.src = mediaUrl(el.getAttribute("src") || "");
+      el.loading = "lazy";
+    }
+    if (el.tagName === "A") {
+      el.target = "_blank";
+      el.rel = "noreferrer";
+    }
+  }
+}
+
+function updatePreview() {
+  const markdown = bodyEl.value.trim();
+  if (!markdown) {
+    previewEl.replaceChildren();
+    return;
+  }
+  previewEl.innerHTML = marked.parse(markdown, { gfm: true, breaks: false });
+  sanitizePreview(previewEl);
+}
+
+function onBodyChange() {
+  syncGalleryFromBody();
+  updatePreview();
+}
+
 async function api(url, options) {
   const response = await fetch(url, options);
   const data = await response.json();
@@ -69,12 +150,11 @@ async function api(url, options) {
 
 async function uploadFile(file) {
   const id = crypto.randomUUID().replaceAll("-", "");
-  const result = await api(`/api/blobs/${id}?name=${encodeURIComponent(file.name)}`, {
+  return api(`/api/blobs/${id}?name=${encodeURIComponent(file.name)}`, {
     method: "PUT",
     headers: { "Content-Type": file.type || "application/octet-stream" },
     body: file,
   });
-  return result;
 }
 
 function renderGallery() {
@@ -89,8 +169,11 @@ function renderGallery() {
     remove.textContent = "×";
     remove.addEventListener("click", () => {
       state.gallery = state.gallery.filter((entry) => entry.src !== item.src);
-      bodyEl.value = bodyEl.value.split(item.raw || `![](${item.src})`).join("").replace(/\n{3,}/g, "\n\n");
-      renderGallery();
+      bodyEl.value = bodyEl.value
+        .split(item.raw || `![](${item.src})`)
+        .join("")
+        .replace(/\n{3,}/g, "\n\n");
+      onBodyChange();
     });
     li.append(img, remove);
     galleryList.append(li);
@@ -100,6 +183,46 @@ function renderGallery() {
 function syncGalleryFromBody() {
   state.gallery = parseImages(bodyEl.value);
   renderGallery();
+}
+
+function applyEdit(result) {
+  bodyEl.value = result.value;
+  bodyEl.focus();
+  bodyEl.setSelectionRange(result.start, result.end);
+  onBodyChange();
+}
+
+function currentRange() {
+  return {
+    start: bodyEl.selectionStart,
+    end: bodyEl.selectionEnd,
+    value: bodyEl.value,
+  };
+}
+
+function runFormat(kind) {
+  const { value, start, end } = currentRange();
+  if (kind === "bold") applyEdit(wrapSelection(value, start, end, "**"));
+  if (kind === "italic") applyEdit(wrapSelection(value, start, end, "*"));
+  if (kind === "h2") applyEdit(applyHeading(value, start, end, 2));
+  if (kind === "h3") applyEdit(applyHeading(value, start, end, 3));
+  if (kind === "quote") applyEdit(toggleLinePrefix(value, start, end, "> "));
+  if (kind === "list") applyEdit(toggleLinePrefix(value, start, end, "- "));
+  if (kind === "image") inlineImageInput.click();
+}
+
+async function insertImagesAtCursor(files) {
+  if (!files?.length) return;
+  let { value, start, end } = currentRange();
+  for (const file of files) {
+    const uploaded = await uploadFile(file);
+    const alt = file.name.replace(/\.[^.]+$/, "");
+    const result = insertSnippet(value, start, end, `![${alt}](${uploaded.src})`);
+    value = result.value;
+    start = result.start;
+    end = result.end;
+  }
+  applyEdit({ value, start, end });
 }
 
 function resetForm() {
@@ -121,6 +244,7 @@ function resetForm() {
   deleteBtn.hidden = true;
   previewLink.hidden = true;
   renderGallery();
+  updatePreview();
   setStatus("填好后点「保存到仓库」，会生成 md / 封面 / 相册。");
   highlight("");
 }
@@ -139,7 +263,6 @@ async function refreshList(activeSlug = "") {
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.slug = article.slug;
-    button.innerHTML = "";
     const title = document.createElement("strong");
     title.textContent = article.title;
     const meta = document.createElement("small");
@@ -176,18 +299,13 @@ async function loadArticle(slug) {
   deleteBtn.hidden = false;
   previewLink.hidden = false;
   previewLink.href = `http://127.0.0.1:3000/articles/${article.slug}/`;
-  syncGalleryFromBody();
+  onBodyChange();
   highlight(article.slug);
   setStatus(`正在编辑 ${article.slug}`);
 }
 
 async function addGalleryFiles(files) {
-  for (const file of files) {
-    const uploaded = await uploadFile(file);
-    const raw = `![](${uploaded.src})`;
-    bodyEl.value = `${bodyEl.value.trim()}\n\n${raw}\n`;
-  }
-  syncGalleryFromBody();
+  await insertImagesAtCursor(files);
 }
 
 function bindDrop(el, onFiles) {
@@ -211,7 +329,35 @@ slugEl.addEventListener("input", () => {
   state.slugTouched = true;
 });
 
-bodyEl.addEventListener("input", syncGalleryFromBody);
+bodyEl.addEventListener("input", onBodyChange);
+bodyEl.addEventListener("scroll", () => {
+  const max = bodyEl.scrollHeight - bodyEl.clientHeight;
+  const ratio = max <= 0 ? 0 : bodyEl.scrollTop / max;
+  const previewMax = previewEl.scrollHeight - previewEl.clientHeight;
+  previewEl.scrollTop = ratio * Math.max(0, previewMax);
+});
+bodyEl.addEventListener("keydown", (event) => {
+  const meta = event.metaKey || event.ctrlKey;
+  if (meta && event.key.toLowerCase() === "b") {
+    event.preventDefault();
+    runFormat("bold");
+  }
+  if (meta && event.key.toLowerCase() === "i") {
+    event.preventDefault();
+    runFormat("italic");
+  }
+});
+
+document.querySelector(".toolbar").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-cmd]");
+  if (!button) return;
+  runFormat(button.dataset.cmd);
+});
+
+inlineImageInput.addEventListener("change", async (event) => {
+  await insertImagesAtCursor(event.target.files || []);
+  event.target.value = "";
+});
 
 document.querySelector("#cover-input").addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
@@ -242,6 +388,11 @@ bindDrop(document.querySelector("#cover-drop"), async (files) => {
 
 bindDrop(document.querySelector("#gallery-drop"), async (files) => {
   await addGalleryFiles(files || []);
+});
+
+bindDrop(bodyEl, async (files) => {
+  const images = [...(files || [])].filter((file) => file.type.startsWith("image/"));
+  if (images.length) await insertImagesAtCursor(images);
 });
 
 document.querySelector("#new-btn").addEventListener("click", (event) => {
@@ -285,7 +436,7 @@ form.addEventListener("submit", async (event) => {
     state.coverBlob = null;
     state.coverKeep = Boolean(article.cover);
     bodyEl.value = article.body;
-    syncGalleryFromBody();
+    onBodyChange();
     deleteBtn.hidden = false;
     previewLink.hidden = false;
     previewLink.href = `http://127.0.0.1:3000${article.preview}`;

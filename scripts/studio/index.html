@@ -79,14 +79,35 @@
             </div>
           </div>
 
-          <label>
-            正文 Markdown
-            <textarea
-              id="body"
-              rows="14"
-              placeholder="段落、引用、列表都可以。相册图会自动追加到文末。"
-            ></textarea>
-          </label>
+          <div class="body-block">
+            <div class="body-head">
+              <span class="label">正文</span>
+              <div class="toolbar" role="toolbar" aria-label="正文格式">
+                <button type="button" data-cmd="bold" title="加粗 Ctrl+B">加粗</button>
+                <button type="button" data-cmd="italic" title="斜体 Ctrl+I">斜体</button>
+                <button type="button" data-cmd="h2" title="二级标题">标题</button>
+                <button type="button" data-cmd="h3" title="三级标题">小标题</button>
+                <button type="button" data-cmd="quote" title="引用">引用</button>
+                <button type="button" data-cmd="list" title="列表">列表</button>
+                <button type="button" data-cmd="image" title="在光标处插入图片">图片</button>
+              </div>
+            </div>
+            <input id="inline-image-input" type="file" accept="image/*" multiple hidden />
+            <div class="split">
+              <div class="pane">
+                <p class="pane-label">原文</p>
+                <textarea
+                  id="body"
+                  rows="16"
+                  placeholder="左边写 Markdown，右边看效果。也可用上面的按钮。"
+                ></textarea>
+              </div>
+              <div class="pane">
+                <p class="pane-label">预览</p>
+                <div id="preview" class="preview"></div>
+              </div>
+            </div>
+          </div>
 
           <p id="status" class="status" role="status"></p>
 
