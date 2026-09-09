@@ -22,4 +22,4 @@ export function paginate<T>(
 }
 
 export const WORK_PAGE_SIZE = 5;
-export const ARTICLE_PAGE_SIZE = 4;
+export const ARTICLE_PAGE_SIZE = 6;

@@ -63,7 +63,7 @@ export function Contact() {
     <section id="contact" className="scroll-mt-20">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <SectionHeading
-          eyebrow="04 / 联系"
+          eyebrow="03 / 联系"
           title="社交媒体"
           description="没有表单。GitHub、博客和邮箱就这些。"
         />
