@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Article } from "@/content/articles";
+import type { Article } from "@/lib/article-types";
 
 function formatDate(value: string) {
   return value.replaceAll("-", ".");
