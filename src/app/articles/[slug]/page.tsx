@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: article.summary,
       type: "article",
       url: `${site.url}/articles/${article.slug}/`,
-      images: [{ url: article.cover }],
+      ...(article.cover ? { images: [{ url: article.cover }] } : {}),
     },
   };
 }
@@ -70,16 +70,18 @@ export default async function ArticlePage({ params }: Props) {
         </p>
       </header>
 
-      <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-card paper-shadow">
-        <Image
-          src={article.cover}
-          alt=""
-          fill
-          sizes="(min-width: 768px) 768px, 100vw"
-          className="object-cover"
-          priority
-        />
-      </div>
+      {article.cover ? (
+        <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-card paper-shadow">
+          <Image
+            src={article.cover}
+            alt=""
+            fill
+            sizes="(min-width: 768px) 768px, 100vw"
+            className="object-cover"
+            priority
+          />
+        </div>
+      ) : null}
 
       <ArticleBody content={article.content} />
 

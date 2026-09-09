@@ -305,7 +305,7 @@ export function saveArticle(root, input, blobs = new Map()) {
       .join("\n\n")}\n`;
   }
 
-  const coverPublic = `/articles/${slug}${coverBuffer ? coverExt : ".jpg"}`;
+  const coverPublic = coverBuffer ? `/articles/${slug}${coverExt}` : "";
   const markdown = buildMarkdown({
     title,
     date,

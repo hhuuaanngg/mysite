@@ -244,7 +244,11 @@ bindDrop(document.querySelector("#gallery-drop"), async (files) => {
   await addGalleryFiles(files || []);
 });
 
-document.querySelector("#new-btn").addEventListener("click", resetForm);
+document.querySelector("#new-btn").addEventListener("click", (event) => {
+  event.preventDefault();
+  resetForm();
+  titleEl.focus();
+});
 
 deleteBtn.addEventListener("click", async () => {
   if (!state.previousSlug) return;

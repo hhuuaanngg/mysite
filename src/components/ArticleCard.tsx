@@ -13,13 +13,19 @@ export function ArticleCard({ article }: { article: Article }) {
       className="group flex h-full min-h-[9.5rem] flex-row overflow-hidden rounded-3xl border border-border bg-card paper-shadow transition-transform duration-200 hover:-translate-y-1"
     >
       <div className="relative w-[7.25rem] min-h-[9.5rem] shrink-0 self-stretch sm:w-36 md:w-40">
-        <Image
-          src={article.cover}
-          alt=""
-          fill
-          sizes="160px"
-          className="object-cover"
-        />
+        {article.cover ? (
+          <Image
+            src={article.cover}
+            alt=""
+            fill
+            sizes="160px"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-yellow px-3 text-center text-xs font-extrabold">
+            {article.category}
+          </div>
+        )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-2 text-xs font-bold">

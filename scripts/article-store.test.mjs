@@ -59,6 +59,21 @@ test("saveArticle writes markdown, cover and numbered gallery", () => {
   assert.match(loaded.body, /风很大/);
 });
 
+test("allowEmpty omits cover file", () => {
+  const root = makeTree();
+  const saved = saveArticle(root, {
+    title: "草稿",
+    slug: "draft-note",
+    category: "生活",
+    summary: "先写字",
+    date: "2026-09-09",
+    body: "还没有图。",
+    allowEmpty: true,
+  });
+  assert.equal(saved.cover, "");
+  assert.equal(fs.existsSync(path.join(root, "public/articles/draft-note.jpg")), false);
+});
+
 test("saveArticle refuses to overwrite another slug from 新建", () => {
   const root = makeTree();
   saveArticle(root, {
