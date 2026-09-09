@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { CopyEmail } from "@/components/CopyEmail";
 import { SectionHeading } from "@/components/SectionHeading";
 import { socials } from "@/content/site";
@@ -37,6 +40,8 @@ function SocialGlyph({ name }: { name: (typeof socials)[number]["icon"] }) {
 }
 
 export function Contact() {
+  const [openId, setOpenId] = useState<string | null>(null);
+
   return (
     <section id="contact" className="scroll-mt-20">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
@@ -48,9 +53,26 @@ export function Contact() {
         <ul className="mt-10 flex flex-wrap items-center gap-4">
           {socials.map((item) => {
             const isEmail = "copy" in item && item.copy;
+            const open = openId === item.id;
 
             return (
-              <li key={item.id} className="group relative">
+              <li
+                key={item.id}
+                className={`social-item relative ${open ? "is-open" : ""}`}
+                onPointerEnter={() => setOpenId(item.id)}
+                onPointerLeave={() => setOpenId(null)}
+                onFocusCapture={() => setOpenId(item.id)}
+                onBlurCapture={(event) => {
+                  const next = event.relatedTarget;
+                  if (
+                    next instanceof Node &&
+                    event.currentTarget.contains(next)
+                  ) {
+                    return;
+                  }
+                  setOpenId(null);
+                }}
+              >
                 <a
                   href={item.href}
                   target={isEmail ? undefined : "_blank"}
@@ -65,7 +87,7 @@ export function Contact() {
                 <div
                   id={`social-tip-${item.id}`}
                   role="tooltip"
-                  className="invisible absolute bottom-full left-0 z-30 w-56 pb-3 opacity-0 transition-opacity duration-150 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 sm:left-1/2 sm:-translate-x-1/2"
+                  className="social-tooltip absolute bottom-full left-0 z-30 w-56 pb-3 transition-opacity duration-150 sm:left-1/2 sm:-translate-x-1/2"
                 >
                   <div className="rounded-2xl border-2 border-foreground bg-card px-4 py-3 shadow-[3px_3px_0_#37352f]">
                     <p className="text-sm font-extrabold tracking-tight">
