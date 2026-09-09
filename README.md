@@ -21,28 +21,51 @@ npm run dev
 npm run build
 ```
 
-## 改内容
+## 新增文章
 
-- 姓名、社交账号：`src/content/site.ts`
-- 作品：`src/content/projects.ts`
-- 文章：在 `src/content/articles/` 新增一个 Markdown 文件，文件名即 slug。例如 `src/content/articles/my-post.md` 对应 `/articles/my-post/`。
+不要改 TypeScript，也不用找 AI 来回改渲染。一条命令生成 Markdown、封面和相册：
+
+```bash
+npm run new:article -- --title "青岛" --slug qingdao-2026 --category 摄影 --summary "海边走了一圈。" --images ~/Pictures/qingdao
+```
+
+只输入命令、按提示填，也可以：
+
+```bash
+npm run new:article
+```
+
+**更快：丢一个草稿文件夹**
+
+```
+drafts/qingdao-2026/
+  article.md     # 标题、分类、摘要、正文
+  cover.jpg      # 封面（不会进正文相册）
+  01.jpg
+  02.jpg
+```
+
+```bash
+npm run new:article -- --from drafts/qingdao-2026
+```
+
+`article.md` 示例：
 
 ```markdown
 ---
-title: 标题
-date: "2026-09-09"
+title: 青岛
 category: 摄影
-summary: 卡片上的一两句摘要。
-cover: /articles/my-post.jpg
+summary: 海边走了一圈。
 ---
 
-正文用 Markdown 写。
-
-![图注](/articles/gallery/my-post/01.jpg)
-
-> 引用
-
-- 列表也可以
+风很大，水很亮。
 ```
 
-封面图放到 `public/articles/`，正文图片放到 `public/articles/gallery/<slug>/`。文章按 `date` 从新到旧排列。
+中文标题必须给 `--slug`（英文短名）。图片会拷到 `public/articles/`，正文写在 `src/content/articles/<slug>.md`。保存后刷新 `http://localhost:3000/articles/<slug>/`。
+
+封面单独指定：`--cover ~/Pictures/cover.jpg`。暂时没图：`--allow-empty`。
+
+## 改其它内容
+
+- 姓名、社交账号：`src/content/site.ts`
+- 作品：`src/content/projects.ts`
