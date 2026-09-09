@@ -307,7 +307,12 @@ export function applyPlan(plan, { dryRun = false } = {}) {
 export function helpText() {
   return `新增文章（不用改 TypeScript，也不用找 AI 来回改）
 
-用法
+可视化（推荐）
+  npm run dev
+  打开 http://127.0.0.1:8787 或站点上的「写文章」
+  点「保存到仓库」即生成 Markdown / 封面 / 相册
+
+命令行
   npm run new:article
   npm run new:article -- --title "青岛" --slug qingdao-2026 --category 摄影 --summary "海边走了一圈。" --images ~/Pictures/qingdao
 

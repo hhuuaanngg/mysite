@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:next": "next dev",
+    "studio": "node scripts/studio-server.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "new:article": "node scripts/new-article.mjs",
-    "test": "node --test scripts/new-article.test.mjs"
+    "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

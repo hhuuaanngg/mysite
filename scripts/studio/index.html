@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>文章工坊</title>
+    <link rel="stylesheet" href="/studio.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <span class="face" aria-hidden="true"></span>
+        <div>
+          <p class="kicker">本机 · 不会上线</p>
+          <h1>文章工坊</h1>
+        </div>
+      </div>
+      <a class="ghost" href="http://127.0.0.1:3000/" target="_blank" rel="noreferrer">打开站点</a>
+    </header>
+
+    <main class="layout">
+      <aside class="side">
+        <button type="button" class="new" id="new-btn">+ 新建文章</button>
+        <p class="hint">点保存就会写入仓库里的 Markdown、封面和相册。</p>
+        <ul id="article-list" class="list"></ul>
+      </aside>
+
+      <section class="editor">
+        <form id="form">
+          <div class="row">
+            <label>
+              标题
+              <input id="title" name="title" required placeholder="青岛" />
+            </label>
+            <label>
+              slug
+              <input id="slug" name="slug" required placeholder="qingdao-2026" autocomplete="off" />
+            </label>
+          </div>
+          <div class="row three">
+            <label>
+              分类
+              <select id="category">
+                <option>摄影</option>
+                <option>生活</option>
+                <option>主题</option>
+              </select>
+            </label>
+            <label>
+              日期
+              <input id="date" type="date" required />
+            </label>
+            <label class="check">
+              <input id="allow-empty" type="checkbox" />
+              暂时没有图
+            </label>
+          </div>
+          <label>
+            摘要
+            <input id="summary" required placeholder="列表上的一两句" />
+          </label>
+
+          <div class="media">
+            <div>
+              <p class="label">封面</p>
+              <label class="drop" id="cover-drop">
+                <input id="cover-input" type="file" accept="image/*" hidden />
+                <img id="cover-preview" alt="" hidden />
+                <span id="cover-copy">拖进来，或点击选择</span>
+              </label>
+            </div>
+            <div>
+              <p class="label">相册（会按顺序写进正文）</p>
+              <label class="drop" id="gallery-drop">
+                <input id="gallery-input" type="file" accept="image/*" multiple hidden />
+                <span>拖多张进来，或点击选择</span>
+              </label>
+              <ul id="gallery-list" class="thumbs"></ul>
+            </div>
+          </div>
+
+          <label>
+            正文 Markdown
+            <textarea
+              id="body"
+              rows="14"
+              placeholder="段落、引用、列表都可以。相册图会自动追加到文末。"
+            ></textarea>
+          </label>
+
+          <p id="status" class="status" role="status"></p>
+
+          <div class="actions">
+            <button type="submit" class="save" id="save-btn">保存到仓库</button>
+            <button type="button" class="danger" id="delete-btn" hidden>删除</button>
+            <a id="preview-link" class="ghost" hidden target="_blank" rel="noreferrer">打开预览</a>
+          </div>
+          <p class="footnote">
+            保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
+          </p>
+        </form>
+      </section>
+    </main>
+    <script src="/studio.js" type="module"></script>
+  </body>
+</html>

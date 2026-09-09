@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)。
+打开 [http://localhost:3000](http://localhost:3000)。导航里会出现 **写文章**，进入本机文章工坊（[http://127.0.0.1:8787](http://127.0.0.1:8787)）。
 
 ## 构建
 
@@ -21,49 +21,35 @@ npm run dev
 npm run build
 ```
 
-## 新增文章
+## 新增 / 编辑文章
 
-不要改 TypeScript，也不用找 AI 来回改渲染。一条命令生成 Markdown、封面和相册：
+本机可视化：打开工坊 → 填标题、slug、摘要 → 拖封面和相册 → 写正文 → **保存到仓库**。会生成：
+
+- `src/content/articles/<slug>.md`
+- `public/articles/<slug>.jpg`
+- `public/articles/gallery/<slug>/01.jpg` …
+
+站点预览：`http://localhost:3000/articles/<slug>/`。确认无误后提交 git，部署即发布。工坊只监听 `127.0.0.1`，不会出现在线上站点。
+
+也可以继续用命令：
 
 ```bash
 npm run new:article -- --title "青岛" --slug qingdao-2026 --category 摄影 --summary "海边走了一圈。" --images ~/Pictures/qingdao
 ```
 
-只输入命令、按提示填，也可以：
-
-```bash
-npm run new:article
-```
-
-**更快：丢一个草稿文件夹**
+或把草稿丢进文件夹再导入：
 
 ```
-drafts/qingdao-2026/
-  article.md     # 标题、分类、摘要、正文
-  cover.jpg      # 封面（不会进正文相册）
-  01.jpg
-  02.jpg
+drafts/qingdao-2026/article.md
+drafts/qingdao-2026/cover.jpg
+drafts/qingdao-2026/*.jpg
 ```
 
 ```bash
 npm run new:article -- --from drafts/qingdao-2026
 ```
 
-`article.md` 示例：
-
-```markdown
----
-title: 青岛
-category: 摄影
-summary: 海边走了一圈。
----
-
-风很大，水很亮。
-```
-
-中文标题必须给 `--slug`（英文短名）。图片会拷到 `public/articles/`，正文写在 `src/content/articles/<slug>.md`。保存后刷新 `http://localhost:3000/articles/<slug>/`。
-
-封面单独指定：`--cover ~/Pictures/cover.jpg`。暂时没图：`--allow-empty`。
+中文标题必须给英文 slug。`drafts/` 已忽略，不会进 git。
 
 ## 改其它内容
 
