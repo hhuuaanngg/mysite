@@ -30,7 +30,11 @@ export function CopyEmail({ email }: { email: string }) {
   return (
     <button
       type="button"
-      onClick={copy}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        void copy();
+      }}
       aria-live="polite"
       className={`rounded-full border px-3 py-1 text-xs font-bold transition-colors ${
         copied

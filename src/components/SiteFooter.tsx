@@ -10,26 +10,19 @@ export function SiteFooter() {
           <NotionFace className="h-5 w-5" />
           © {new Date().getFullYear()} {site.name}
         </p>
-        <div className="flex gap-5">
+        <div className="flex flex-wrap gap-5">
           <Link href="/#work" className="hover:text-foreground">
             作品
           </Link>
-          <a
-            href={site.blog.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground"
-          >
-            博客
-          </a>
-          <a
-            href={site.github.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-foreground"
-          >
-            GitHub
-          </a>
+          <Link href="/#articles" className="hover:text-foreground">
+            文章
+          </Link>
+          <Link href="/#about" className="hover:text-foreground">
+            关于
+          </Link>
+          <Link href="/#contact" className="hover:text-foreground">
+            联系
+          </Link>
         </div>
       </div>
     </footer>

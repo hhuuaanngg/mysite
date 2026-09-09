@@ -1,5 +1,5 @@
 import { About } from "@/components/About";
-import { Capabilities } from "@/components/Capabilities";
+import { ArticleList } from "@/components/ArticleList";
 import { Contact } from "@/components/Contact";
 import { Hero } from "@/components/Hero";
 import { WorkGrid } from "@/components/WorkGrid";
@@ -9,7 +9,7 @@ export default function Home() {
     <main>
       <Hero />
       <WorkGrid />
-      <Capabilities />
+      <ArticleList />
       <About />
       <Contact />
     </main>

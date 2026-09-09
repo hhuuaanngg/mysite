@@ -26,7 +26,7 @@ export function Hero() {
           >
             {site.tagline}
             <br />
-            先看作品，再看技术栈。
+            作品、文章，慢慢看。
           </p>
           <div
             className="fade-up mt-9 flex flex-wrap gap-3"
@@ -39,10 +39,10 @@ export function Hero() {
               看作品
             </Link>
             <Link
-              href="/#contact"
+              href="/#articles"
               className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-bold text-foreground paper-shadow transition-transform hover:-translate-y-0.5"
             >
-              联系
+              看文章
             </Link>
           </div>
         </div>

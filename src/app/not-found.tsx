@@ -22,7 +22,7 @@ export default function NotFound() {
       </p>
       <h1 className="mt-4 text-3xl font-extrabold tracking-tight">没有这页</h1>
       <p className="mt-3 max-w-[65ch] text-base leading-7 text-muted">
-        地址不对，或者项目已经撤下。回首页看作品。
+        地址不对，或者项目已经撤下。回首页看作品和文章。
       </p>
       <Link
         href="/"

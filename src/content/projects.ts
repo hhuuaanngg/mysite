@@ -145,6 +145,72 @@ export const projects: Project[] = [
       accent: "#4d7c0f",
     },
   },
+  {
+    slug: "iplay-theme",
+    title: "iplay",
+    year: "2020",
+    summary: "给技术站用的 WordPress 主题，先发了 alpha，挂在 iplay.codes。",
+    problem:
+      "技术站需要一个自己能改的主题：样式要可控，小改动不能每次求人。现成主题改起来反而更慢。",
+    solution:
+      "自己做了一套偏工具站的 WordPress 主题，两天出了 alpha，直接用在 iplay.codes 上看效果。",
+    highlights: [
+      "面向个人技术站，而不是杂志型博客",
+      "样式自己写，改需求不用绕开别人的框架",
+    ],
+    stack: ["WordPress", "PHP", "CSS"],
+    url: "http://iplay.codes",
+    cover: {
+      mark: "ip",
+      from: "#efe4fb",
+      to: "#d9c4f5",
+      accent: "#7c3aed",
+    },
+  },
+  {
+    slug: "custom-html-code",
+    title: "Custom HTML Code",
+    year: "2013",
+    summary: "把统计代码从主题文件里拆出来的 WordPress 插件。",
+    problem:
+      "统计代码写在主题里，一换主题就丢。流量不看也罢，过半年想翻一下却发现数据断了。",
+    solution:
+      "做了个很小的插件，专门存自定义 HTML / 统计代码，和主题脱钩。",
+    highlights: [
+      "统计代码与主题分离",
+      "换主题不再丢追踪代码",
+    ],
+    stack: ["WordPress", "PHP"],
+    repo: "https://github.com/hhuuaanngg/iplay-AnalyticsCodes",
+    url: "http://iplay.codes/wp-plugin-ac/",
+    cover: {
+      mark: "ac",
+      from: "#fde8d8",
+      to: "#f5c9a8",
+      accent: "#c2410c",
+    },
+  },
+  {
+    slug: "theme-2c",
+    title: "主题 2C",
+    year: "2013",
+    summary: "基于 Twenty Twelve 的 WordPress 主题，给个人日志站用。",
+    problem:
+      "当时同时养两个站，需要一个够简单、加载快、自己还能改 logo 的主题。",
+    solution:
+      "在 Twenty Twelve 上收成一套个人日志主题，带社交挂件，后来两个站合并就只做维护。",
+    highlights: [
+      "基于 Twenty Twelve，结构简单",
+      "带社交 Widget，适合个人日志",
+    ],
+    stack: ["WordPress", "PHP", "CSS"],
+    cover: {
+      mark: "2c",
+      from: "#dbeafe",
+      to: "#bfdbfe",
+      accent: "#1d4ed8",
+    },
+  },
 ];
 
 export function getProject(slug: string): Project | undefined {
@@ -157,4 +223,8 @@ export function getFeaturedProjects(): Project[] {
 
 export function getOtherProjects(): Project[] {
   return projects.filter((project) => !project.featured);
+}
+
+export function getProjectsInDisplayOrder(): Project[] {
+  return [...getFeaturedProjects(), ...getOtherProjects()];
 }

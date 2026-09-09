@@ -46,27 +46,15 @@ export function SiteHeader() {
           className="hidden items-center gap-1 text-sm font-semibold text-muted md:flex"
           aria-label="主导航"
         >
-          {nav.map((item) =>
-            "external" in item && item.external ? (
-              <a
-                key={item.href}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full px-3 py-1.5 transition-colors hover:bg-card hover:text-foreground"
-              >
-                {item.label}
-              </a>
-            ) : (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-full px-3 py-1.5 transition-colors hover:bg-card hover:text-foreground"
-              >
-                {item.label}
-              </Link>
-            ),
-          )}
+          {nav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-full px-3 py-1.5 transition-colors hover:bg-card hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <button
@@ -89,25 +77,13 @@ export function SiteHeader() {
           <ul className="flex flex-col gap-1">
             {nav.map((item) => (
               <li key={item.href}>
-                {"external" in item && item.external ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block rounded-xl px-2 py-2 text-sm font-semibold text-muted hover:bg-card hover:text-foreground"
-                    onClick={() => setOpen(false)}
-                  >
-                    {item.label}
-                  </a>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="block rounded-xl px-2 py-2 text-sm font-semibold text-muted hover:bg-card hover:text-foreground"
-                    onClick={() => setOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                )}
+                <Link
+                  href={item.href}
+                  className="block rounded-xl px-2 py-2 text-sm font-semibold text-muted hover:bg-card hover:text-foreground"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>

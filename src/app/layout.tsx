@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
-  keywords: ["独立开发者", "作品集", "portfolio", "Joey Huang", "hjy.me"],
+  keywords: ["独立开发者", "作品", "文章", "portfolio", "Joey Huang", "hjy.me"],
   openGraph: {
     type: "website",
     locale: "zh_CN",
