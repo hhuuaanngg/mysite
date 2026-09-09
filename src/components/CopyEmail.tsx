@@ -2,28 +2,39 @@
 
 import { useState } from "react";
 
+function fallbackCopy(email: string) {
+  const input = document.createElement("textarea");
+  input.value = email;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.left = "-9999px";
+  document.body.appendChild(input);
+  input.select();
+  const ok = document.execCommand("copy");
+  document.body.removeChild(input);
+  return ok;
+}
+
 export function CopyEmail({ email }: { email: string }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2500);
+
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(email);
-      } else {
-        const input = document.createElement("textarea");
-        input.value = email;
-        input.setAttribute("readonly", "");
-        input.style.position = "fixed";
-        input.style.left = "-9999px";
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand("copy");
-        document.body.removeChild(input);
+        return;
       }
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2500);
     } catch {
-      setCopied(false);
+      // Some browsers expose clipboard but reject writeText.
+    }
+
+    try {
+      fallbackCopy(email);
+    } catch {
+      // Label already flipped; the address is still visible in the tooltip.
     }
   }
 
