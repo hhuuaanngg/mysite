@@ -239,6 +239,14 @@ form {
   gap: 14px;
 }
 
+body[data-mode="works"] #form,
+body[data-mode="works"] #article-side,
+body[data-mode="articles"] #work-form,
+body[data-mode="articles"] #work-side,
+[hidden] {
+  display: none !important;
+}
+
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
