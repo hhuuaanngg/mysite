@@ -175,44 +175,13 @@
             </label>
           </div>
 
-          <div class="body-block">
-            <div class="body-head">
-              <span class="label">正文（Markdown）</span>
-              <div class="toolbar" id="work-toolbar" role="toolbar" aria-label="作品正文格式">
-                <button type="button" data-cmd="bold" title="加粗 Ctrl+B">加粗</button>
-                <button type="button" data-cmd="italic" title="斜体 Ctrl+I">斜体</button>
-                <button type="button" data-cmd="h2" title="二级标题">标题</button>
-                <button type="button" data-cmd="h3" title="三级标题">小标题</button>
-                <button type="button" data-cmd="quote" title="引用">引用</button>
-                <button type="button" data-cmd="list" title="列表">列表</button>
-                <button type="button" data-cmd="image" title="在光标处插入图片">图片</button>
-              </div>
-            </div>
-            <input id="work-inline-image-input" type="file" accept="image/*" multiple hidden />
-            <div class="split">
-              <div class="pane">
-                <p class="pane-label">原文</p>
-                <textarea
-                  id="work-body"
-                  rows="16"
-                  required
-                  placeholder="左边写 Markdown，右边看效果。"
-                ></textarea>
-              </div>
-              <div class="pane">
-                <p class="pane-label">预览</p>
-                <div id="work-preview" class="preview"></div>
-              </div>
-            </div>
-          </div>
-
           <div class="work-cover-row">
             <div>
               <p class="label">封面图（可选）</p>
               <label class="drop" id="work-cover-drop">
                 <input id="work-cover-input" type="file" accept="image/*" hidden />
                 <img id="work-cover-image" alt="" hidden />
-                <span id="work-cover-copy">拖进来，或点击选择。有图时不用色块。</span>
+                <span id="work-cover-copy">拖进来，或点击选择。有图时顶部不再用色块。</span>
               </label>
               <button type="button" class="ghost" id="work-cover-clear" hidden>去掉封面图</button>
               <p class="label" style="margin-top:14px">没有图时的色块</p>
@@ -228,6 +197,38 @@
                 <img id="work-cover-preview-image" alt="" hidden />
                 <span id="work-cover-mark">aa</span>
                 <span id="work-cover-year">2026</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="body-block">
+            <div class="body-head">
+              <span class="label">正文（Markdown）</span>
+              <div class="toolbar" id="work-toolbar" role="toolbar" aria-label="作品正文格式">
+                <button type="button" data-cmd="bold" title="加粗 Ctrl+B">加粗</button>
+                <button type="button" data-cmd="italic" title="斜体 Ctrl+I">斜体</button>
+                <button type="button" data-cmd="h2" title="二级标题">标题</button>
+                <button type="button" data-cmd="h3" title="三级标题">小标题</button>
+                <button type="button" data-cmd="quote" title="引用">引用</button>
+                <button type="button" data-cmd="list" title="列表">列表</button>
+                <button type="button" data-cmd="image" title="在光标处插入图片">图片</button>
+              </div>
+            </div>
+            <input id="work-inline-image-input" type="file" accept="image/*" multiple hidden />
+            <p class="hint">工具栏插图会写进正文；若还没上传封面，第一张图会当作封面。</p>
+            <div class="split">
+              <div class="pane">
+                <p class="pane-label">原文</p>
+                <textarea
+                  id="work-body"
+                  rows="16"
+                  required
+                  placeholder="左边写 Markdown，右边看效果。"
+                ></textarea>
+              </div>
+              <div class="pane">
+                <p class="pane-label">预览</p>
+                <div id="work-preview" class="preview"></div>
               </div>
             </div>
           </div>

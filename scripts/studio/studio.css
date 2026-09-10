@@ -193,6 +193,10 @@ h1 {
   background: var(--card);
 }
 
+.body-block .hint {
+  margin: 0 0 10px;
+}
+
 .hint,
 .footnote,
 .status {

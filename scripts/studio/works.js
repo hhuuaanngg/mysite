@@ -211,13 +211,19 @@ function runFormat(kind) {
 async function insertImagesAtCursor(files) {
   if (!files?.length) return;
   let { value, start, end } = currentRange();
-  for (const file of files) {
+  for (const [index, file] of [...files].entries()) {
     const uploaded = await uploadFile(file);
     const alt = file.name.replace(/\.[^.]+$/, "");
     const result = insertSnippet(value, start, end, `![${alt}](${uploaded.src})`);
     value = result.value;
     start = result.start;
     end = result.end;
+    if (index === 0 && !state.coverSrc) {
+      state.coverBlob = uploaded.id;
+      state.coverKeep = false;
+      state.coverSrc = uploaded.src;
+      updateCoverPreview();
+    }
   }
   applyEdit({ value, start, end });
 }

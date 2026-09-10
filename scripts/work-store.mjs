@@ -415,6 +415,13 @@ export function saveWork(root, input, blobs = new Map()) {
     }
   }
 
+  if (!coverImage) {
+    const first = parseMarkdownImages(body).find(
+      (image) => image.src.startsWith("/works/") || image.src.startsWith("/articles/"),
+    );
+    if (first) coverImage = first.src;
+  }
+
   const work = normalizeWork({
     ...input,
     slug,

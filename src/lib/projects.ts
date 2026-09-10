@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import "server-only";
+import { firstMarkdownImageSrc } from "@/lib/markdown-images";
 import type { Project, ProjectCover, ProjectDocument } from "@/lib/project-types";
 
 export type { Project, ProjectCover, ProjectDocument };
@@ -80,16 +81,22 @@ function loadAll(): ProjectDocument[] {
     const slug = asString(data.slug ?? file.slice(0, -".md".length), "slug", file);
     const repo = asOptionalString(data.repo);
     const url = asOptionalString(data.url);
+    const content = parsed.content.trim();
+    const cover = asCover(data.cover, file);
+    if (!cover.image) {
+      const fromBody = firstMarkdownImageSrc(content);
+      if (fromBody) cover.image = fromBody;
+    }
     const project: ProjectDocument = {
       slug,
       title: asString(data.title, "title", file),
       year: asString(data.year, "year", file),
       order: asOrder(data.order, file),
       summary: asString(data.summary, "summary", file),
-      content: parsed.content.trim(),
+      content,
       stack: asStringList(data.stack, "stack", file),
       featured: data.featured === true,
-      cover: asCover(data.cover, file),
+      cover,
     };
     if (repo) project.repo = repo;
     if (url) project.url = url;

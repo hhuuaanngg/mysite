@@ -154,7 +154,7 @@ test("existing works use a known cover palette", () => {
   }
 });
 
-test("saveWork writes gallery images referenced in markdown", () => {
+test("saveWork uses the first body image as cover when none is uploaded", () => {
   const root = makeTree();
   const blobs = new Map([["img1", { buffer: Buffer.from("pic"), ext: ".png" }]]);
   const saved = saveWork(
@@ -166,6 +166,7 @@ test("saveWork writes gallery images referenced in markdown", () => {
     blobs,
   );
   assert.ok(saved.files.includes("public/works/gallery/demo-work/01.png"));
+  assert.equal(saved.cover.image, "/works/gallery/demo-work/01.png");
   assert.match(saved.body, /\/works\/gallery\/demo-work\/01.png/);
 });
 
