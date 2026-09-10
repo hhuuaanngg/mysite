@@ -5,15 +5,15 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
 
-const FROST_RANGE = 160;
+const FROST_RANGE = 420;
 
 function frostStyle(scrollY: number, menuOpen: boolean): CSSProperties {
   const raw = menuOpen ? 1 : Math.min(1, Math.max(0, scrollY / FROST_RANGE));
-  const progress = raw * raw * (3 - 2 * raw);
+  const progress = raw * raw;
   return {
-    "--header-tint": (0.55 * progress).toFixed(3),
-    "--header-blur": `${(18 * progress).toFixed(2)}px`,
-    "--header-sat": (1 + 0.4 * progress).toFixed(3),
+    "--header-tint": (0.52 * progress).toFixed(3),
+    "--header-blur": `${(20 * progress).toFixed(2)}px`,
+    "--header-sat": (1 + 0.35 * progress).toFixed(3),
     "--header-line": progress.toFixed(3),
   } as CSSProperties;
 }
