@@ -11,9 +11,18 @@ function frostProgress(scrollY: number, menuOpen: boolean) {
   return menuOpen ? 1 : Math.min(1, Math.max(0, scrollY / FROST_RANGE));
 }
 
-function frostPaneStyle(progress: number): CSSProperties {
-  const blur = 22 * progress;
-  const tint = 0.55 * progress;
+function headerFrostStyle(progress: number): CSSProperties {
+  if (progress <= 0.001) {
+    return {
+      backgroundColor: "transparent",
+      backdropFilter: "none",
+      WebkitBackdropFilter: "none",
+      borderBottomColor: "transparent",
+    };
+  }
+
+  const blur = 20 * progress;
+  const tint = 0.42 * progress;
   const sat = 100 + 80 * progress;
   const filter = `blur(${blur.toFixed(2)}px) saturate(${sat.toFixed(0)}%)`;
 
@@ -21,7 +30,7 @@ function frostPaneStyle(progress: number): CSSProperties {
     backgroundColor: `rgba(247, 246, 243, ${tint.toFixed(3)})`,
     backdropFilter: filter,
     WebkitBackdropFilter: filter,
-    borderBottomColor: `rgba(227, 226, 222, ${(0.95 * progress).toFixed(3)})`,
+    borderBottomColor: `rgba(227, 226, 222, ${(0.9 * progress).toFixed(3)})`,
   };
 }
 
@@ -30,7 +39,6 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    let frame = 0;
     const update = () => {
       setScrollY(
         window.scrollY ||
@@ -39,15 +47,12 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
           0,
       );
     };
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
-    };
     update();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", update, { passive: true });
+    document.addEventListener("scroll", update, { passive: true });
     return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", update);
+      document.removeEventListener("scroll", update);
     };
   }, []);
 
@@ -64,14 +69,12 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
 
   return (
     <>
-      <header className="site-header fixed inset-x-0 top-0 z-50">
-        <div
-          className="site-header-frost"
-          style={frostPaneStyle(progress)}
-          data-frosted={progress > 0.04 ? "true" : "false"}
-          aria-hidden
-        />
-        <div className="site-header-bar mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
+      <header
+        className="site-header fixed inset-x-0 top-0 z-50"
+        style={headerFrostStyle(progress)}
+        data-frosted={progress > 0.04 ? "true" : "false"}
+      >
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-extrabold tracking-tight text-foreground"
@@ -119,7 +122,7 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
         {open ? (
           <nav
             id="mobile-nav"
-            className="site-header-bar border-t border-border px-5 py-3 md:hidden"
+            className="border-t border-border px-5 py-3 md:hidden"
             aria-label="移动导航"
           >
             <ul className="flex flex-col gap-1">
