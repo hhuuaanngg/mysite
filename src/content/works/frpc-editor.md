@@ -18,11 +18,14 @@ cover:
   from: "#fde8d8"
   to: "#f7c9b4"
   accent: "#c4552a"
+  image: "/works/frpc-editor.png"
 ---
 
 ## 问题
 
 frp 客户端配置写在 TOML 里，代理类型多、字段分散。改错一行就要对照文档，命令行启停也缺少状态反馈。
+
+![Codex 图像 2026年9月8日 17_28_20](/works/gallery/frpc-editor/01.png)
 
 ## 方案
 
