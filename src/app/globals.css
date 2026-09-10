@@ -55,18 +55,7 @@ body {
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 28px 28px;
-}
-
-.site-header {
-  border-bottom: 1px solid transparent;
-}
-
-@supports not (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
-  .site-header[data-frosted="true"] {
-    background-color: rgb(247 246 243 / 0.92) !important;
-  }
+  background-attachment: fixed;
 }
 
 :focus-visible {
