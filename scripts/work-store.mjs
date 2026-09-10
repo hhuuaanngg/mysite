@@ -204,6 +204,17 @@ export function saveWork(root, input) {
   fs.mkdirSync(dir, { recursive: true });
   const file = workPath(root, slug);
   fs.writeFileSync(file, serializeWork(work));
+  const files = [path.relative(root, file)];
+
+  if (work.featured) {
+    for (const other of listWorks(root)) {
+      if (other.slug === work.slug || !other.featured) continue;
+      other.featured = false;
+      const otherFile = workPath(root, other.slug);
+      fs.writeFileSync(otherFile, serializeWork(other));
+      files.push(path.relative(root, otherFile));
+    }
+  }
 
   if (previousSlug && previousSlug !== slug) {
     deleteWork(root, previousSlug);
@@ -212,6 +223,6 @@ export function saveWork(root, input) {
   return {
     ...work,
     preview: `/work/${slug}/`,
-    files: [path.relative(root, file)],
+    files,
   };
 }

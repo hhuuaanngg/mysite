@@ -55,6 +55,26 @@ test("saveWork writes JSON and featured items come first", () => {
   assert.equal(listed[1].repo, "https://github.com/hhuuaanngg/mysite");
 });
 
+test("checking featured makes that work the only featured item", () => {
+  const root = makeTree();
+  saveWork(root, { ...sample, featured: true });
+  saveWork(root, {
+    ...sample,
+    title: "新精选",
+    slug: "new-featured",
+    featured: true,
+    repo: "",
+    highlights: ["一条"],
+    stack: ["Go"],
+  });
+
+  const listed = listWorks(root);
+  assert.equal(listed[0].slug, "new-featured");
+  assert.equal(listed[0].featured, true);
+  assert.equal(listed[1].slug, "demo-work");
+  assert.equal(listed[1].featured, false);
+});
+
 test("saveWork refuses to overwrite another slug from 新建", () => {
   const root = makeTree();
   saveWork(root, sample);
