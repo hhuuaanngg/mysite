@@ -17,7 +17,7 @@ const sample = {
   year: "2026",
   summary: "用来验证工坊写入。",
   problem: "以前要改 TypeScript。",
-  solution: "现在保存成 JSON。",
+  solution: "现在保存成 Markdown。",
   highlights: "一条要点\n另一条要点",
   stack: "Next.js, TypeScript",
   repo: "https://github.com/hhuuaanngg/mysite",
@@ -29,7 +29,7 @@ const sample = {
   },
 };
 
-test("saveWork writes JSON and featured items come first", () => {
+test("saveWork writes markdown with frontmatter and body", () => {
   const root = makeTree();
   saveWork(root, sample);
   const featured = saveWork(root, {
@@ -37,22 +37,24 @@ test("saveWork writes JSON and featured items come first", () => {
     title: "精选",
     slug: "featured-work",
     featured: true,
-    highlights: ["只写一条"],
+    body: "## 问题\n\n只写一条。",
     stack: ["Rust"],
     repo: "",
     url: "",
   });
 
-  assert.equal(featured.files[0], "src/content/works/featured-work.json");
+  assert.equal(featured.files[0], "src/content/works/featured-work.md");
   const file = fs.readFileSync(path.join(root, featured.files[0]), "utf8");
-  assert.match(file, /"featured": true/);
-  assert.doesNotMatch(file, /"repo":/);
+  assert.match(file, /featured: true/);
+  assert.match(file, /## 问题/);
+  assert.doesNotMatch(file, /^repo:/m);
 
   const listed = listWorks(root);
   assert.equal(listed[0].slug, "featured-work");
   assert.equal(listed[1].slug, "demo-work");
   assert.deepEqual(listed[1].stack, ["Next.js", "TypeScript"]);
   assert.equal(listed[1].repo, "https://github.com/hhuuaanngg/mysite");
+  assert.match(listed[1].body, /以前要改 TypeScript/);
 });
 
 test("checking featured makes that work the only featured item", () => {
@@ -64,7 +66,7 @@ test("checking featured makes that work the only featured item", () => {
     slug: "new-featured",
     featured: true,
     repo: "",
-    highlights: ["一条"],
+    body: "## 方案\n\n一条",
     stack: ["Go"],
   });
 
@@ -99,6 +101,7 @@ test("saveWork keeps order when renaming slug", () => {
   assert.equal(saved.order, 0);
   assert.equal(readWork(root, "demo-work"), null);
   assert.equal(readWork(root, "demo-renamed")?.title, "测试项目");
+  assert.equal(fs.existsSync(path.join(root, "src/content/works/demo-work.md")), false);
 });
 
 test("invalid cover color is rejected", () => {
@@ -113,10 +116,26 @@ test("invalid cover color is rejected", () => {
   );
 });
 
+test("saveWork writes gallery images referenced in markdown", () => {
+  const root = makeTree();
+  const blobs = new Map([["img1", { buffer: Buffer.from("pic"), ext: ".png" }]]);
+  const saved = saveWork(
+    root,
+    {
+      ...sample,
+      body: "## 方案\n\n看图。\n\n![](/__blob__/img1.png)",
+    },
+    blobs,
+  );
+  assert.ok(saved.files.includes("public/works/gallery/demo-work/01.png"));
+  assert.match(saved.body, /\/works\/gallery\/demo-work\/01.png/);
+});
+
 test("repo works files load in original display order", () => {
   const works = listWorks(path.resolve(import.meta.dirname, ".."));
   assert.equal(works[0].slug, "frpc-editor");
   assert.equal(works[0].featured, true);
+  assert.match(works[0].body, /## 问题/);
   assert.deepEqual(
     works.map((work) => work.slug),
     [

@@ -1,15 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
+import matter from "gray-matter";
 import "server-only";
-import type { Project, ProjectCover } from "@/lib/project-types";
+import type { Project, ProjectCover, ProjectDocument } from "@/lib/project-types";
 
-export type { Project, ProjectCover };
+export type { Project, ProjectCover, ProjectDocument };
 
 const WORKS_DIR = path.join(process.cwd(), "src/content/works");
 const COLOR = /^#[0-9a-fA-F]{6}$/;
 
 function asString(value: unknown, field: string, file: string): string {
   if (typeof value === "string" && value.trim()) return value.trim();
+  if (typeof value === "number") return String(value);
   throw new Error(`${file} 缺少字段 ${field}`);
 }
 
@@ -56,31 +58,33 @@ function asCover(value: unknown, file: string): ProjectCover {
   };
 }
 
-function loadAll(): Project[] {
+function toProject(doc: ProjectDocument): Project {
+  const { content, ...project } = doc;
+  void content;
+  return project;
+}
+
+function loadAll(): ProjectDocument[] {
   if (!fs.existsSync(WORKS_DIR)) return [];
 
-  const files = fs.readdirSync(WORKS_DIR).filter((name) => name.endsWith(".json"));
+  const files = fs.readdirSync(WORKS_DIR).filter((name) => name.endsWith(".md"));
 
   const projects = files.map((file) => {
-    const raw = JSON.parse(fs.readFileSync(path.join(WORKS_DIR, file), "utf8")) as Record<
-      string,
-      unknown
-    >;
-    const slug = asString(raw.slug ?? file.slice(0, -".json".length), "slug", file);
-    const repo = asOptionalString(raw.repo);
-    const url = asOptionalString(raw.url);
-    const project: Project = {
+    const parsed = matter(fs.readFileSync(path.join(WORKS_DIR, file), "utf8"));
+    const data = parsed.data as Record<string, unknown>;
+    const slug = asString(data.slug ?? file.slice(0, -".md".length), "slug", file);
+    const repo = asOptionalString(data.repo);
+    const url = asOptionalString(data.url);
+    const project: ProjectDocument = {
       slug,
-      title: asString(raw.title, "title", file),
-      year: asString(raw.year, "year", file),
-      order: asOrder(raw.order, file),
-      summary: asString(raw.summary, "summary", file),
-      problem: asString(raw.problem, "problem", file),
-      solution: asString(raw.solution, "solution", file),
-      highlights: asStringList(raw.highlights, "highlights", file),
-      stack: asStringList(raw.stack, "stack", file),
-      featured: raw.featured === true,
-      cover: asCover(raw.cover, file),
+      title: asString(data.title, "title", file),
+      year: asString(data.year, "year", file),
+      order: asOrder(data.order, file),
+      summary: asString(data.summary, "summary", file),
+      content: parsed.content.trim(),
+      stack: asStringList(data.stack, "stack", file),
+      featured: data.featured === true,
+      cover: asCover(data.cover, file),
     };
     if (repo) project.repo = repo;
     if (url) project.url = url;
@@ -94,7 +98,7 @@ function loadAll(): Project[] {
   });
 }
 
-function getAll(): Project[] {
+function getAll(): ProjectDocument[] {
   if (process.env.NODE_ENV === "development") {
     return loadAll();
   }
@@ -102,25 +106,25 @@ function getAll(): Project[] {
 }
 
 declare global {
-  var __mysiteProjects: Project[] | undefined;
+  var __mysiteProjects: ProjectDocument[] | undefined;
 }
 
 export function getProjects(): Project[] {
-  return getAll();
+  return getAll().map(toProject);
 }
 
-export function getProject(slug: string): Project | undefined {
+export function getProject(slug: string): ProjectDocument | undefined {
   return getAll().find((project) => project.slug === slug);
 }
 
 export function getFeaturedProjects(): Project[] {
-  return getAll().filter((project) => project.featured);
+  return getAll().filter((project) => project.featured).map(toProject);
 }
 
 export function getOtherProjects(): Project[] {
-  return getAll().filter((project) => !project.featured);
+  return getAll().filter((project) => !project.featured).map(toProject);
 }
 
 export function getProjectsInDisplayOrder(): Project[] {
-  return getAll();
+  return getProjects();
 }
