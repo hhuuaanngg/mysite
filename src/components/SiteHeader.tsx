@@ -5,16 +5,12 @@ import { useEffect, useState } from "react";
 import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
 
-const FROST_RANGE = 160;
-
 export function SiteHeader({ studioHref }: { studioHref?: string }) {
-  const [progress, setProgress] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      setProgress(Math.min(1, Math.max(0, window.scrollY / FROST_RANGE)));
-    };
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -29,21 +25,13 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const tint = open ? 1 : progress;
-  const frosted = open || progress > 0.02;
-
   return (
     <header
-      className={`sticky top-0 z-50 border-b transition-[border-color] duration-200 ${
-        frosted
+      className={`sticky top-0 z-50 border-b transition-colors duration-200 ${
+        scrolled || open
           ? "border-border bg-background/85 backdrop-blur-md"
           : "border-transparent bg-transparent"
       }`}
-      style={
-        frosted
-          ? { backgroundColor: `rgb(247 246 243 / ${(0.85 * tint).toFixed(3)})` }
-          : undefined
-      }
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
         <Link
