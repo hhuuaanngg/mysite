@@ -1,4 +1,4 @@
-import type { Project } from "@/content/projects";
+import type { Project } from "@/lib/project-types";
 
 export function ProjectCover({
   project,
