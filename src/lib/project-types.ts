@@ -10,13 +10,14 @@ export type Project = {
   title: string;
   year: string;
   summary: string;
-  problem: string;
-  solution: string;
-  highlights: string[];
   stack: string[];
   repo?: string;
   url?: string;
   featured?: boolean;
   order: number;
   cover: ProjectCover;
+};
+
+export type ProjectDocument = Project & {
+  content: string;
 };

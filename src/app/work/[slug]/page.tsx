@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArticleBody } from "@/components/ArticleBody";
 import { ProjectCover } from "@/components/ProjectCover";
 import { getProject, getProjects } from "@/lib/projects";
 
@@ -66,32 +67,12 @@ export default async function WorkPage({ params }: WorkPageProps) {
       </div>
 
       <div className="mt-12 grid gap-12 md:grid-cols-[minmax(0,1fr)_16rem]">
-        <div className="max-w-[65ch] space-y-10">
-          <section>
-            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
-              问题
-            </h2>
-            <p className="mt-3 text-base leading-7 text-muted">{project.problem}</p>
-          </section>
-          <section>
-            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
-              方案
-            </h2>
-            <p className="mt-3 text-base leading-7 text-muted">
-              {project.solution}
-            </p>
-          </section>
-          <section>
-            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
-              技术要点
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-muted">
-              {project.highlights.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-        </div>
+        <ArticleBody
+          content={project.content}
+          className="space-y-6"
+          heading="pill"
+          empty="这个项目介绍还在整理中。"
+        />
 
         <aside className="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
           <h2 className="text-xs font-extrabold tracking-wide text-subtle uppercase">

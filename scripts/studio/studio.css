@@ -539,7 +539,7 @@ textarea {
   align-items: center;
 }
 
-#work-form textarea {
+#work-form textarea:not(#work-body) {
   font-family: inherit;
   resize: vertical;
   min-height: 96px;

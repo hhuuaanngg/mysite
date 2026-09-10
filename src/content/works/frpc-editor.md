@@ -1,0 +1,37 @@
+---
+title: "frpc-editor"
+year: "2026"
+order: 0
+featured: true
+summary: "图形化编辑并运行 frpc.toml 的桌面客户端。"
+stack:
+  - "Tauri 2"
+  - "React 19"
+  - "TypeScript"
+  - "Vite"
+  - "Tailwind CSS"
+  - "Zustand"
+  - "Monaco Editor"
+repo: "https://github.com/hhuuaanngg/remote-frpc3"
+cover:
+  mark: "fr"
+  from: "#fde8d8"
+  to: "#f7c9b4"
+  accent: "#c4552a"
+---
+
+## 问题
+
+frp 客户端配置写在 TOML 里，代理类型多、字段分散。改错一行就要对照文档，命令行启停也缺少状态反馈。
+
+## 方案
+
+用表单覆盖常用配置，同时保留 TOML 实时预览与校验；可选择本地 frpc 可执行文件，启动或停止进程，托盘里也能操作。
+
+## 技术要点
+
+- 全局、认证、传输、日志与 Web 管理等常用配置用表单维护
+- 支持 tcp、udp、http、https、stcp、xtcp 等代理类型与 visitor
+- Monaco 预览 TOML，解析失败会直接标出来
+- 启动、停止本地 frpc，显示运行状态和 PID
+- 系统托盘、开机启动编辑器，可选随后自动拉起 frpc

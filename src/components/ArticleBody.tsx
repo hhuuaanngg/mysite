@@ -147,18 +147,39 @@ const markdownComponents: Components = {
   },
 };
 
-export function ArticleBody({ content }: { content: string }) {
+const pillHeading: Components["h2"] = ({ children }) => (
+  <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide text-foreground">
+    {children}
+  </h2>
+);
+
+export function ArticleBody({
+  content,
+  empty = "这篇文章还在整理中。",
+  className = "mt-10 space-y-6",
+  heading = "default",
+}: {
+  content: string;
+  empty?: string;
+  className?: string;
+  heading?: "default" | "pill";
+}) {
   if (!content.trim()) {
     return (
       <p className="mt-10 max-w-[65ch] text-base leading-7 text-muted">
-        这篇文章还在整理中。
+        {empty}
       </p>
     );
   }
 
+  const components =
+    heading === "pill"
+      ? { ...markdownComponents, h2: pillHeading }
+      : markdownComponents;
+
   return (
-    <div className="mt-10 space-y-6">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+    <div className={className}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>
     </div>

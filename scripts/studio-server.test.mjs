@@ -23,6 +23,7 @@ test("studio API lists and reads works", async () => {
     const one = await fetch(`${base}/api/works/champiere`).then((res) => res.json());
     assert.equal(one.work.title, "Champiere");
     assert.equal(one.work.url, "https://champiere.com");
+    assert.match(one.work.body, /## 问题/);
   } finally {
     server.close();
   }

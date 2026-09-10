@@ -174,7 +174,7 @@ export function createStudioServer({
 
       if (method === "PUT" && url.pathname === "/api/works") {
         const payload = JSON.parse((await readBody(req, 2_000_000)).toString("utf8"));
-        const saved = saveWork(root, payload);
+        const saved = saveWork(root, payload, blobs);
         sendJson(res, 200, { ok: true, work: saved });
         return;
       }
