@@ -1,19 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
 
+const FROST_RANGE = 160;
+
+function frostStyle(scrollY: number, menuOpen: boolean): CSSProperties {
+  const raw = menuOpen ? 1 : Math.min(1, Math.max(0, scrollY / FROST_RANGE));
+  const progress = raw * raw * (3 - 2 * raw);
+  return {
+    "--header-tint": (0.55 * progress).toFixed(3),
+    "--header-blur": `${(18 * progress).toFixed(2)}px`,
+    "--header-sat": (1 + 0.4 * progress).toFixed(3),
+    "--header-line": progress.toFixed(3),
+  } as CSSProperties;
+}
+
 export function SiteHeader({ studioHref }: { studioHref?: string }) {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    let frame = 0;
+    const update = () => {
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -27,11 +50,8 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b transition-colors duration-200 ${
-        scrolled || open
-          ? "border-border bg-background/85 backdrop-blur-md"
-          : "border-transparent bg-transparent"
-      }`}
+      className="site-header sticky top-0 z-50"
+      style={frostStyle(scrollY, open)}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
         <Link
@@ -81,7 +101,7 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
       {open ? (
         <nav
           id="mobile-nav"
-          className="border-t border-border bg-background/95 px-5 py-3 md:hidden"
+          className="border-t border-border bg-background/80 px-5 py-3 md:hidden"
           aria-label="移动导航"
         >
           <ul className="flex flex-col gap-1">
