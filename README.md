@@ -11,7 +11,9 @@ npm install
 npm run dev
 ```
 
-打开 [http://localhost:3000](http://localhost:3000)。导航里会出现 **写文章**，进入本机文章工坊（[http://127.0.0.1:8787](http://127.0.0.1:8787)）。
+打开 [http://127.0.0.1:3100](http://127.0.0.1:3100)。导航里会出现 **写文章**，进入本机文章工坊（[http://127.0.0.1:4310](http://127.0.0.1:4310)）。
+
+站点不用 3000，工坊不用 8787，避免和本机其它服务抢端口。改端口：`SITE_PORT=3200 STUDIO_PORT=4320 npm run dev`。
 
 ## 构建
 
@@ -29,7 +31,7 @@ npm run build
 - `public/articles/<slug>.jpg`
 - `public/articles/gallery/<slug>/01.jpg` …
 
-站点预览：`http://localhost:3000/articles/<slug>/`。确认无误后提交 git，部署即发布。工坊只监听 `127.0.0.1`，不会出现在线上站点。
+站点预览：`http://127.0.0.1:3100/articles/<slug>/`。确认无误后提交 git，部署即发布。工坊只监听 `127.0.0.1`，不会出现在线上站点。
 
 也可以继续用命令：
 

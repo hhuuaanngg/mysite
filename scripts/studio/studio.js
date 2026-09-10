@@ -18,6 +18,7 @@ const previewEl = document.querySelector("#preview");
 const allowEmptyEl = document.querySelector("#allow-empty");
 const statusEl = document.querySelector("#status");
 const previewLink = document.querySelector("#preview-link");
+const openSiteLink = document.querySelector("[data-open-site]");
 const deleteBtn = document.querySelector("#delete-btn");
 const coverPreview = document.querySelector("#cover-preview");
 const coverCopy = document.querySelector("#cover-copy");
@@ -60,6 +61,8 @@ const state = {
   coverKeep: false,
   gallery: [],
 };
+
+let siteOrigin = (openSiteLink?.href || "http://127.0.0.1:3100").replace(/\/$/, "");
 
 function setStatus(text, kind = "") {
   statusEl.textContent = text;
@@ -146,6 +149,14 @@ async function api(url, options) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "请求失败");
   return data;
+}
+
+async function loadMeta() {
+  const meta = await api("/api/meta");
+  if (meta.site) {
+    siteOrigin = String(meta.site).replace(/\/$/, "");
+    if (openSiteLink) openSiteLink.href = `${siteOrigin}/`;
+  }
 }
 
 async function uploadFile(file) {
@@ -298,7 +309,7 @@ async function loadArticle(slug) {
   }
   deleteBtn.hidden = false;
   previewLink.hidden = false;
-  previewLink.href = `http://127.0.0.1:3000/articles/${article.slug}/`;
+  previewLink.href = `${siteOrigin}/articles/${article.slug}/`;
   onBodyChange();
   highlight(article.slug);
   setStatus(`正在编辑 ${article.slug}`);
@@ -439,7 +450,7 @@ form.addEventListener("submit", async (event) => {
     onBodyChange();
     deleteBtn.hidden = false;
     previewLink.hidden = false;
-    previewLink.href = `http://127.0.0.1:3000${article.preview}`;
+    previewLink.href = `${siteOrigin}${article.preview}`;
     await refreshList(article.slug);
     setStatus(
       `已生成 ${article.files.join("、")}。打开预览确认后，提交 git 即可发布。`,
@@ -450,5 +461,9 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-resetForm();
-refreshList().catch((error) => setStatus(error.message, "err"));
+loadMeta()
+  .catch((error) => setStatus(error.message, "err"))
+  .finally(() => {
+    resetForm();
+    refreshList().catch((error) => setStatus(error.message, "err"));
+  });

@@ -3,6 +3,7 @@ import { Geist_Mono, Nunito } from "next/font/google";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/content/site";
+import { STUDIO_ORIGIN } from "@/lib/local-ports";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -62,7 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader
           studioHref={
             process.env.NODE_ENV === "development"
-              ? "http://127.0.0.1:8787"
+              ? (process.env.STUDIO_ORIGIN ?? STUDIO_ORIGIN)
               : undefined
           }
         />

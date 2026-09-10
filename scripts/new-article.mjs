@@ -6,6 +6,7 @@ import process from "node:process";
 import readline from "node:readline/promises";
 import { pathToFileURL } from "node:url";
 import matter from "gray-matter";
+import { SITE_ORIGIN, STUDIO_ORIGIN } from "./ports.mjs";
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 const COVER_NAMES = new Set(["cover.jpg", "cover.jpeg", "cover.png", "cover.webp"]);
@@ -309,7 +310,7 @@ export function helpText() {
 
 可视化（推荐）
   npm run dev
-  打开 http://127.0.0.1:8787 或站点上的「写文章」
+  打开 ${STUDIO_ORIGIN} 或站点上的「写文章」
   点「保存到仓库」即生成 Markdown / 封面 / 相册
 
 命令行
@@ -378,7 +379,7 @@ function printPlan(plan, { dryRun }) {
     dryRun ? "预览（未写盘）" : "已创建",
     "",
     `  ${plan.title}  ·  ${plan.category}  ·  ${plan.date}`,
-    `  预览  http://localhost:3000${plan.preview}`,
+    `  预览  ${SITE_ORIGIN}${plan.preview}`,
     "",
   ];
 

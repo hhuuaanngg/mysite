@@ -12,8 +12,9 @@ import {
   todayISO,
 } from "./article-store.mjs";
 
-export const STUDIO_PORT = 8787;
-export const STUDIO_HOST = "127.0.0.1";
+import { SITE_ORIGIN, STUDIO_HOST, STUDIO_PORT } from "./ports.mjs";
+
+export { STUDIO_HOST, STUDIO_PORT };
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO_DIR = path.join(HERE, "studio");
@@ -96,14 +97,14 @@ export function createStudioServer({
       const method = req.method || "GET";
 
       if (method === "GET" && url.pathname === "/api/health") {
-        sendJson(res, 200, { ok: true, site: "http://127.0.0.1:3000" });
+        sendJson(res, 200, { ok: true, site: SITE_ORIGIN });
         return;
       }
 
       if (method === "GET" && url.pathname === "/api/meta") {
         sendJson(res, 200, {
           today: todayISO(),
-          site: "http://127.0.0.1:3000",
+          site: SITE_ORIGIN,
           blobPrefix: BLOB_PREFIX,
         });
         return;
