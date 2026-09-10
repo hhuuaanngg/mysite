@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/ArticleBody";
-import { getArticleDocument, getArticles } from "@/lib/articles";
+import { getArticleDocument, getArticles, markdownStartsWithImage } from "@/lib/articles";
 import { site } from "@/content/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -70,7 +70,7 @@ export default async function ArticlePage({ params }: Props) {
         </p>
       </header>
 
-      {article.cover ? (
+      {article.cover && !markdownStartsWithImage(article.content) ? (
         <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-card paper-shadow">
           <Image
             src={article.cover}

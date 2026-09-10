@@ -8,6 +8,10 @@ export type { Article, ArticleDocument };
 
 const ARTICLES_DIR = path.join(process.cwd(), "src/content/articles");
 
+function optionalString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function asString(value: unknown, field: string, file: string): string {
   if (typeof value === "string" && value.trim()) return value.trim();
   throw new Error(`${file} 缺少 frontmatter 字段 ${field}`);
@@ -50,7 +54,7 @@ function loadAll(): ArticleDocument[] {
       date: asDate(data.date, file),
       category: asString(data.category, "category", file),
       summary: asString(data.summary, "summary", file),
-      cover: asString(data.cover, "cover", file),
+      cover: optionalString(data.cover),
       content: content.trim(),
     };
   });
@@ -86,4 +90,8 @@ export function getArticles(): Article[] {
 
 export function getArticleDocument(slug: string): ArticleDocument | undefined {
   return getDocuments().find((article) => article.slug === slug);
+}
+
+export function markdownStartsWithImage(content: string) {
+  return /^!\[[^\]]*\]\([^)]+\)/.test(content.trim());
 }
