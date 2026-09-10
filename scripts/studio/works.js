@@ -482,6 +482,7 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   setStatus("正在写入文件…");
   try {
+    const palette = currentPalette();
     const payload = {
       title: titleEl.value.trim(),
       slug: slugEl.value.trim(),
@@ -496,7 +497,10 @@ form.addEventListener("submit", async (event) => {
       url: urlEl.value.trim(),
       cover: {
         mark: markEl.value.trim(),
-        palette: state.paletteId,
+        palette: palette.id,
+        from: palette.from,
+        to: palette.to,
+        accent: palette.accent,
         ...(state.coverBlob
           ? { blob: state.coverBlob }
           : { keep: state.coverKeep }),

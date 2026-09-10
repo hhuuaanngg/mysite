@@ -105,6 +105,17 @@ test("saveWork keeps order when renaming slug", () => {
   assert.equal(fs.existsSync(path.join(root, "src/content/works/demo-work.md")), false);
 });
 
+test("saveWork accepts palette id without hex fields", () => {
+  const root = makeTree();
+  const saved = saveWork(root, {
+    ...sample,
+    cover: { mark: "dw", palette: "mint" },
+  });
+  assert.equal(saved.cover.from, "#d8f3ea");
+  assert.equal(saved.cover.to, "#b7e4d4");
+  assert.equal(saved.cover.accent, "#0f7b6c");
+});
+
 test("invalid cover color is rejected", () => {
   const root = makeTree();
   assert.throws(

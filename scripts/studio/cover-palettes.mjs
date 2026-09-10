@@ -31,5 +31,9 @@ export function resolveCoverPalette(cover = {}) {
   );
   if (matched) return matched;
 
+  if (!from && !to && !accent) {
+    return paletteById(DEFAULT_PALETTE_ID);
+  }
+
   throw new Error("请选择一套封面配色");
 }
