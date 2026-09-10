@@ -62,7 +62,7 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
               target="_blank"
               rel="noreferrer"
             >
-              写文章
+              写内容
             </a>
           ) : null}
         </nav>
@@ -104,7 +104,7 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  写文章
+                  写内容
                 </a>
               </li>
             ) : null}

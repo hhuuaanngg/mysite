@@ -3,26 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>文章工坊</title>
+    <title>内容工坊</title>
     <link rel="stylesheet" href="/studio.css" />
   </head>
-  <body>
+  <body data-mode="articles">
     <header class="top">
       <div class="brand">
         <span class="face" aria-hidden="true"></span>
         <div>
           <p class="kicker">本机 · 不会上线</p>
-          <h1>文章工坊</h1>
+          <h1 id="studio-title">内容工坊</h1>
         </div>
       </div>
-      <a class="ghost" data-open-site href="http://127.0.0.1:3100/" target="_blank" rel="noreferrer">打开站点</a>
+      <div class="top-actions">
+        <nav class="modes" role="tablist" aria-label="内容类型">
+          <button type="button" role="tab" data-mode="articles" class="active">文章</button>
+          <button type="button" role="tab" data-mode="works">作品</button>
+        </nav>
+        <a class="ghost" data-open-site href="http://127.0.0.1:3100/" target="_blank" rel="noreferrer">打开站点</a>
+      </div>
     </header>
 
     <main class="layout">
       <aside class="side">
-        <button type="button" class="new" id="new-btn">+ 新建文章</button>
-        <p class="hint">点保存就会写入仓库里的 Markdown、封面和相册。</p>
-        <ul id="article-list" class="list"></ul>
+        <div id="article-side">
+          <button type="button" class="new" id="new-btn">+ 新建文章</button>
+          <p class="hint">点保存就会写入仓库里的 Markdown、封面和相册。</p>
+          <ul id="article-list" class="list"></ul>
+        </div>
+        <div id="work-side" hidden>
+          <button type="button" class="new" id="new-work-btn">+ 新建作品</button>
+          <p class="hint">点保存就会写入 <code>src/content/works/&lt;slug&gt;.json</code>。</p>
+          <ul id="work-list" class="list"></ul>
+        </div>
       </aside>
 
       <section class="editor">
@@ -120,8 +133,116 @@
             保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
           </p>
         </form>
+
+        <form id="work-form" hidden>
+          <div class="row">
+            <label>
+              标题
+              <input id="work-title" required placeholder="frpc-editor" />
+            </label>
+            <label>
+              slug
+              <input id="work-slug" required placeholder="frpc-editor" autocomplete="off" />
+            </label>
+          </div>
+          <div class="row three">
+            <label>
+              年份
+              <input id="work-year" required placeholder="2026 或 早期" />
+            </label>
+            <label class="check">
+              <input id="work-featured" type="checkbox" />
+              精选（首页大卡）
+            </label>
+            <span></span>
+          </div>
+          <label>
+            摘要
+            <input id="work-summary" required placeholder="列表上的一两句" />
+          </label>
+          <label>
+            问题
+            <textarea id="work-problem" rows="4" required placeholder="当时碰到什么麻烦。"></textarea>
+          </label>
+          <label>
+            方案
+            <textarea id="work-solution" rows="4" required placeholder="后来怎么做成的。"></textarea>
+          </label>
+          <div class="row">
+            <label>
+              要点（一行一条）
+              <textarea id="work-highlights" rows="6" required placeholder="表单覆盖常用配置"></textarea>
+            </label>
+            <label>
+              技术栈（一行一个，或逗号分隔）
+              <textarea id="work-stack" rows="6" required placeholder="TypeScript"></textarea>
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              GitHub（可选）
+              <input id="work-repo" type="url" placeholder="https://github.com/..." />
+            </label>
+            <label>
+              线上地址（可选）
+              <input id="work-url" type="url" placeholder="https://..." />
+            </label>
+          </div>
+
+          <div class="work-cover-row">
+            <div>
+              <p class="label">封面色块</p>
+              <div class="row">
+                <label>
+                  字母
+                  <input id="work-mark" required maxlength="8" placeholder="fr" />
+                </label>
+                <label>
+                  起始色
+                  <span class="color-field">
+                    <input id="work-from-picker" type="color" value="#fde8d8" />
+                    <input id="work-from" value="#fde8d8" required />
+                  </span>
+                </label>
+              </div>
+              <div class="row">
+                <label>
+                  结束色
+                  <span class="color-field">
+                    <input id="work-to-picker" type="color" value="#f7c9b4" />
+                    <input id="work-to" value="#f7c9b4" required />
+                  </span>
+                </label>
+                <label>
+                  强调色
+                  <span class="color-field">
+                    <input id="work-accent-picker" type="color" value="#c4552a" />
+                    <input id="work-accent" value="#c4552a" required />
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div>
+              <p class="label">预览</p>
+              <div id="work-cover-preview" class="work-cover" aria-hidden="true">
+                <span id="work-cover-mark">aa</span>
+                <span id="work-cover-year">2026</span>
+              </div>
+            </div>
+          </div>
+
+          <p id="work-status" class="status" role="status"></p>
+          <div class="actions">
+            <button type="submit" class="save">保存到仓库</button>
+            <button type="button" class="danger" id="work-delete-btn" hidden>删除</button>
+            <a id="work-preview-link" class="ghost" hidden target="_blank" rel="noreferrer">打开预览</a>
+          </div>
+          <p class="footnote">
+            保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
+          </p>
+        </form>
       </section>
     </main>
-    <script src="/studio.js" type="module"></script>
+    <script src="/app.js" type="module"></script>
   </body>
 </html>

@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProjectCover } from "@/components/ProjectCover";
-import { getProject, projects } from "@/content/projects";
+import { getProject, getProjects } from "@/lib/projects";
 
 type WorkPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+  return getProjects().map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({

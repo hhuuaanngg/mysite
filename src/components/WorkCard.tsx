@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ProjectCover } from "@/components/ProjectCover";
-import type { Project } from "@/content/projects";
+import type { Project } from "@/lib/project-types";
 
 export function WorkCard({
   project,

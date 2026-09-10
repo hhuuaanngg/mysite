@@ -11,6 +11,7 @@ import {
   saveArticle,
   todayISO,
 } from "./article-store.mjs";
+import { deleteWork, listWorks, readWork, saveWork } from "./work-store.mjs";
 
 import { SITE_ORIGIN, STUDIO_HOST, STUDIO_PORT } from "./ports.mjs";
 
@@ -144,6 +145,40 @@ export function createStudioServer({
         return;
       }
 
+      if (method === "GET" && url.pathname === "/api/works") {
+        sendJson(res, 200, { works: listWorks(root) });
+        return;
+      }
+
+      const workMatch = url.pathname.match(/^\/api\/works\/([a-z0-9-]+)$/);
+      if (workMatch && method === "GET") {
+        const work = readWork(root, workMatch[1]);
+        if (!work) {
+          sendJson(res, 404, { error: "没有这个作品" });
+          return;
+        }
+        sendJson(res, 200, { work });
+        return;
+      }
+
+      if (workMatch && method === "DELETE") {
+        const slug = workMatch[1];
+        if (!readWork(root, slug)) {
+          sendJson(res, 404, { error: "没有这个作品" });
+          return;
+        }
+        deleteWork(root, slug);
+        sendJson(res, 200, { ok: true, slug });
+        return;
+      }
+
+      if (method === "PUT" && url.pathname === "/api/works") {
+        const payload = JSON.parse((await readBody(req, 2_000_000)).toString("utf8"));
+        const saved = saveWork(root, payload);
+        sendJson(res, 200, { ok: true, work: saved });
+        return;
+      }
+
       const blobMatch = url.pathname.match(/^\/api\/blobs\/([a-zA-Z0-9_-]+)$/);
       if (blobMatch && method === "PUT") {
         const id = safeBlobId(blobMatch[1]);
@@ -242,7 +277,7 @@ const invokedDirectly = process.argv[1] && fileURLToPath(import.meta.url) === pa
 if (invokedDirectly) {
   startStudio()
     .then((server) => {
-      console.log(`文章工坊  ${server.url}`);
+      console.log(`内容工坊  ${server.url}`);
     })
     .catch((error) => {
       console.error(error instanceof Error ? error.message : error);

@@ -45,6 +45,39 @@ body {
   z-index: 2;
 }
 
+.top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.modes {
+  display: inline-flex;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+}
+
+.modes button {
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modes button.active {
+  background: var(--foreground);
+  color: #fffefb;
+}
+
 .brand {
   display: flex;
   gap: 12px;
@@ -498,6 +531,82 @@ textarea {
   align-items: center;
 }
 
+#work-form textarea {
+  font-family: inherit;
+  resize: vertical;
+  min-height: 96px;
+}
+
+.work-cover-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 16px;
+  align-items: start;
+}
+
+.color-field {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.color-field input[type="color"] {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.work-cover {
+  position: relative;
+  min-height: 160px;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: linear-gradient(155deg, #fde8d8 0%, #f7c9b4 100%);
+}
+
+.work-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(to right, rgb(55 53 47 / 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(55 53 47 / 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.work-cover span {
+  position: absolute;
+  z-index: 1;
+}
+
+#work-cover-mark {
+  left: 22px;
+  bottom: 18px;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #c4552a;
+}
+
+#work-cover-year {
+  right: 18px;
+  bottom: 22px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(255 254 251 / 0.8);
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .status.ok {
   color: var(--accent);
   font-weight: 800;
@@ -513,7 +622,8 @@ textarea {
   .row,
   .row.three,
   .media,
-  .split {
+  .split,
+  .work-cover-row {
     grid-template-columns: 1fr;
   }
 

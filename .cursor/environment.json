@@ -5,7 +5,7 @@
     {
       "name": "next-dev",
       "command": "npm run dev",
-      "description": "Next.js on http://127.0.0.1:3100 and article studio on http://127.0.0.1:4310"
+      "description": "Next.js on http://127.0.0.1:3100 and content studio on http://127.0.0.1:4310"
     }
   ],
   "ports": [
@@ -14,7 +14,7 @@
       "port": 3100
     },
     {
-      "name": "article-studio",
+      "name": "studio",
       "port": 4310
     }
   ]

@@ -1,0 +1,25 @@
+{
+  "slug": "custom-html-code",
+  "title": "Custom HTML Code",
+  "year": "2013",
+  "order": 6,
+  "summary": "把统计代码从主题文件里拆出来的 WordPress 插件。",
+  "problem": "统计代码写在主题里，一换主题就丢。流量不看也罢，过半年想翻一下却发现数据断了。",
+  "solution": "做了个很小的插件，专门存自定义 HTML / 统计代码，和主题脱钩。",
+  "highlights": [
+    "统计代码与主题分离",
+    "换主题不再丢追踪代码"
+  ],
+  "stack": [
+    "WordPress",
+    "PHP"
+  ],
+  "cover": {
+    "mark": "ac",
+    "from": "#fde8d8",
+    "to": "#f5c9a8",
+    "accent": "#c2410c"
+  },
+  "repo": "https://github.com/hhuuaanngg/iplay-AnalyticsCodes",
+  "url": "http://iplay.codes/wp-plugin-ac/"
+}

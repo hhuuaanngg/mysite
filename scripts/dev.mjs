@@ -17,10 +17,10 @@ const nextArgs = hasPortFlag
 let studio;
 try {
   studio = await startStudio({ port: STUDIO_PORT, root });
-  console.log(`文章工坊  ${studio.url}`);
+  console.log(`内容工坊  ${studio.url}`);
 } catch (error) {
   if (error && error.code === "EADDRINUSE") {
-    console.log(`文章工坊已在 ${STUDIO_ORIGIN}`);
+    console.log(`内容工坊已在 ${STUDIO_ORIGIN}`);
   } else {
     console.error(error);
     process.exit(1);
