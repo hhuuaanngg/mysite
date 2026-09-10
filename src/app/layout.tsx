@@ -67,7 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               : undefined
           }
         />
-        <div id="content" className="relative z-10 flex flex-1 flex-col">
+        <div id="content" className="flex flex-1 flex-col">
           {children}
         </div>
         <SiteFooter />
