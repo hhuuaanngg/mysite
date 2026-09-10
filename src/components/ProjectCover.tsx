@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Project } from "@/lib/project-types";
 
 export function ProjectCover({
@@ -8,6 +9,23 @@ export function ProjectCover({
   size?: "default" | "hero";
 }) {
   const height = size === "hero" ? "h-56 sm:h-72 md:h-80" : "h-44 sm:h-52";
+
+  if (project.cover.image) {
+    return (
+      <div className={`relative overflow-hidden ${height}`}>
+        <Image
+          src={project.cover.image}
+          alt=""
+          fill
+          sizes="(min-width: 768px) 768px, 100vw"
+          className="object-cover"
+        />
+        <span className="absolute right-6 bottom-6 rounded-full bg-card/80 px-2.5 py-0.5 font-mono text-xs tracking-widest text-muted uppercase sm:right-8 sm:bottom-8">
+          {project.year}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div

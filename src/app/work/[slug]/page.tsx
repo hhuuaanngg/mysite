@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/ArticleBody";
 import { ProjectCover } from "@/components/ProjectCover";
+import { TableOfContents } from "@/components/TableOfContents";
+import { extractMarkdownToc } from "@/lib/markdown-toc";
 import { getProject, getProjects } from "@/lib/projects";
 
 type WorkPageProps = {
@@ -42,6 +44,8 @@ export default async function WorkPage({ params }: WorkPageProps) {
     notFound();
   }
 
+  const toc = extractMarkdownToc(project.content);
+
   return (
     <article className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <p className="text-sm font-bold text-subtle">
@@ -74,46 +78,49 @@ export default async function WorkPage({ params }: WorkPageProps) {
           empty="这个项目介绍还在整理中。"
         />
 
-        <aside className="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
-          <h2 className="text-xs font-extrabold tracking-wide text-subtle uppercase">
-            链接与栈
-          </h2>
-          <ul className="mt-4 space-y-3 text-sm font-bold">
-            {project.repo ? (
-              <li>
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
+        <aside className="space-y-6">
+          <div className="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
+            <h2 className="text-xs font-extrabold tracking-wide text-subtle uppercase">
+              链接与栈
+            </h2>
+            <ul className="mt-4 space-y-3 text-sm font-bold">
+              {project.repo ? (
+                <li>
+                  <a
+                    href={project.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    GitHub ↗
+                  </a>
+                </li>
+              ) : null}
+              {project.url ? (
+                <li>
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    线上 ↗
+                  </a>
+                </li>
+              ) : null}
+            </ul>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {project.stack.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-[11px] text-subtle"
                 >
-                  GitHub ↗
-                </a>
-              </li>
-            ) : null}
-            {project.url ? (
-              <li>
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  线上 ↗
-                </a>
-              </li>
-            ) : null}
-          </ul>
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {project.stack.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-[11px] text-subtle"
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <TableOfContents items={toc} />
         </aside>
       </div>
     </article>

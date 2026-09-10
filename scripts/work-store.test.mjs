@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { listWorks, readWork, saveWork } from "./work-store.mjs";
+import { resolveCoverPalette } from "./studio/cover-palettes.mjs";
 
 function makeTree() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "work-store-"));
@@ -112,8 +113,34 @@ test("invalid cover color is rejected", () => {
         ...sample,
         cover: { ...sample.cover, from: "red" },
       }),
-    /#RRGGBB/,
+    /封面配色/,
   );
+});
+
+test("saveWork writes an optional cover image", () => {
+  const root = makeTree();
+  const blobs = new Map([["cover1", { buffer: Buffer.from("cover-bytes"), ext: ".png" }]]);
+  const saved = saveWork(
+    root,
+    {
+      ...sample,
+      cover: { ...sample.cover, blob: "cover1" },
+    },
+    blobs,
+  );
+  assert.ok(saved.files.includes("public/works/demo-work.png"));
+  assert.equal(saved.cover.image, "/works/demo-work.png");
+  assert.equal(
+    fs.readFileSync(path.join(root, "public/works/demo-work.png"), "utf8"),
+    "cover-bytes",
+  );
+});
+
+test("existing works use a known cover palette", () => {
+  const works = listWorks(path.resolve(import.meta.dirname, ".."));
+  for (const work of works) {
+    assert.ok(resolveCoverPalette(work.cover).id);
+  }
 });
 
 test("saveWork writes gallery images referenced in markdown", () => {

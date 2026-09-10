@@ -3,6 +3,7 @@ export type ProjectCover = {
   from: string;
   to: string;
   accent: string;
+  image?: string;
 };
 
 export type Project = {

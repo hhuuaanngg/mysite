@@ -7,8 +7,8 @@ import {
   parseMarkdownImages,
   slugify,
 } from "./article-store.mjs";
+import { resolveCoverPalette } from "./studio/cover-palettes.mjs";
 
-const COLOR = /^#[0-9a-fA-F]{6}$/;
 const HTTP = /^https?:\/\/.+/i;
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
@@ -56,12 +56,18 @@ function asOrder(value) {
   return null;
 }
 
-function asColor(value, field) {
-  const color = asString(value);
-  if (!COLOR.test(color)) {
-    throw new Error(`${field} 必须是 #RRGGBB，例如 #fde8d8`);
-  }
-  return color.toLowerCase();
+function publicWorksDir(root) {
+  return path.join(root, "public/works");
+}
+
+export function listWorkCoverFiles(root, slug) {
+  const dir = publicWorksDir(root);
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((name) => name.startsWith(`${slug}.`))
+    .filter((name) => IMAGE_EXT.has(path.extname(name).toLowerCase()))
+    .map((name) => path.join(dir, name));
 }
 
 function asOptionalUrl(value, field) {
@@ -162,6 +168,7 @@ function normalizeWork(input) {
   if (missing.length > 0) throw new Error(`缺少${missing.join("、")}`);
   if (mark.length > 8) throw new Error("封面字母最多 8 个字符");
 
+  const palette = resolveCoverPalette(cover);
   const order = asOrder(input.order);
   const work = {
     slug,
@@ -174,11 +181,13 @@ function normalizeWork(input) {
     featured: asBool(input.featured),
     cover: {
       mark,
-      from: asColor(cover.from, "起始色"),
-      to: asColor(cover.to, "结束色"),
-      accent: asColor(cover.accent, "强调色"),
+      from: palette.from,
+      to: palette.to,
+      accent: palette.accent,
     },
   };
+  const image = asString(cover.image);
+  if (image) work.cover.image = image;
   const repo = asOptionalUrl(input.repo, "GitHub");
   const url = asOptionalUrl(input.url, "线上地址");
   if (repo) work.repo = repo;
@@ -247,6 +256,7 @@ export function serializeWork(work) {
   const featuredLine = work.featured ? "featured: true\n" : "";
   const repoLine = work.repo ? `repo: ${yamlQuote(work.repo)}\n` : "";
   const urlLine = work.url ? `url: ${yamlQuote(work.url)}\n` : "";
+  const imageLine = work.cover.image ? `  image: ${yamlQuote(work.cover.image)}\n` : "";
   return `---
 title: ${yamlQuote(work.title)}
 year: ${yamlQuote(work.year)}
@@ -259,7 +269,7 @@ ${repoLine}${urlLine}cover:
   from: ${yamlQuote(work.cover.from)}
   to: ${yamlQuote(work.cover.to)}
   accent: ${yamlQuote(work.cover.accent)}
----
+${imageLine}---
 
 ${work.body.trim()}
 `;
@@ -273,6 +283,9 @@ export function deleteWork(root, slug) {
   if (fs.existsSync(json)) fs.unlinkSync(json);
   const gallery = galleryDir(root, slug);
   if (fs.existsSync(gallery)) fs.rmSync(gallery, { recursive: true, force: true });
+  for (const file of listWorkCoverFiles(root, slug)) {
+    fs.unlinkSync(file);
+  }
 }
 
 function rewriteBodyImages(root, slug, bodyIn, blobs) {
@@ -362,12 +375,56 @@ export function saveWork(root, input, blobs = new Map()) {
     blobs,
   );
 
+  let coverImage = "";
+  const coverInput = input.cover && typeof input.cover === "object" ? input.cover : {};
+  if (coverInput.blob) {
+    const blob = blobs.get(coverInput.blob);
+    if (!blob) throw new Error("找不到刚上传的封面");
+    const coverExt = normalizeExt(blob.ext || coverInput.ext);
+    const coverPath = path.join(publicWorksDir(root), `${slug}${coverExt}`);
+    fs.mkdirSync(path.dirname(coverPath), { recursive: true });
+    fs.writeFileSync(coverPath, blob.buffer);
+    coverImage = `/works/${slug}${coverExt}`;
+    imageFiles.push(path.relative(root, coverPath));
+    for (const leftover of listWorkCoverFiles(root, slug)) {
+      if (leftover !== coverPath) fs.unlinkSync(leftover);
+    }
+  } else if (coverInput.keep !== false) {
+    const fromSlug = previousSlug || slug;
+    const previousCover =
+      previous?.cover?.image ||
+      existing?.cover?.image ||
+      "";
+    const coverFile = previousCover
+      ? resolveLocalFile(root, previousCover)
+      : listWorkCoverFiles(root, fromSlug)[0];
+    if (coverFile) {
+      const coverExt = normalizeExt(path.extname(coverFile));
+      const coverPath = path.join(publicWorksDir(root), `${slug}${coverExt}`);
+      fs.mkdirSync(path.dirname(coverPath), { recursive: true });
+      if (coverFile !== coverPath) fs.copyFileSync(coverFile, coverPath);
+      coverImage = `/works/${slug}${coverExt}`;
+      imageFiles.push(path.relative(root, coverPath));
+      for (const leftover of listWorkCoverFiles(root, slug)) {
+        if (leftover !== coverPath) fs.unlinkSync(leftover);
+      }
+    }
+  } else {
+    for (const leftover of listWorkCoverFiles(root, slug)) {
+      fs.unlinkSync(leftover);
+    }
+  }
+
   const work = normalizeWork({
     ...input,
     slug,
     title,
     order,
     body,
+    cover: {
+      ...coverInput,
+      image: coverImage,
+    },
   });
 
   const dir = worksDir(root);

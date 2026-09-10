@@ -50,11 +50,16 @@ function asCover(value: unknown, file: string): ProjectCover {
     throw new Error(`${file} 缺少 cover`);
   }
   const cover = value as Record<string, unknown>;
+  const image =
+    typeof cover.image === "string" && cover.image.trim()
+      ? cover.image.trim()
+      : undefined;
   return {
     mark: asString(cover.mark, "cover.mark", file),
     from: asColor(cover.from, "cover.from", file),
     to: asColor(cover.to, "cover.to", file),
     accent: asColor(cover.accent, "cover.accent", file),
+    ...(image ? { image } : {}),
   };
 }
 

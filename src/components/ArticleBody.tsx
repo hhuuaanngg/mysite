@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { extractMarkdownToc } from "@/lib/markdown-toc";
 
 function imageCaption(alt: string) {
   const value = alt.trim();
@@ -24,25 +25,49 @@ function isImageOnlyParagraph(node: { children?: unknown[] } | undefined) {
   return only.type === "element" && only.tagName === "img";
 }
 
+function headingComponents(getId: () => string | undefined): Pick<
+  Components,
+  "h1" | "h2" | "h3"
+> {
+  return {
+    h1({ children }) {
+      return (
+        <h1
+          id={getId()}
+          className="max-w-[65ch] scroll-mt-24 text-2xl font-extrabold tracking-tight text-foreground"
+        >
+          {children}
+        </h1>
+      );
+    },
+    h2({ children }) {
+      return (
+        <h2
+          id={getId()}
+          className="max-w-[65ch] scroll-mt-24 text-xl font-extrabold tracking-tight text-foreground"
+        >
+          {children}
+        </h2>
+      );
+    },
+    h3({ children }) {
+      return (
+        <h3
+          id={getId()}
+          className="max-w-[65ch] scroll-mt-24 text-lg font-extrabold tracking-tight text-foreground"
+        >
+          {children}
+        </h3>
+      );
+    },
+  };
+}
+
 const markdownComponents: Components = {
   p({ node, children }) {
     if (isImageOnlyParagraph(node)) return <>{children}</>;
     return (
       <p className="max-w-[65ch] text-base leading-8 text-muted">{children}</p>
-    );
-  },
-  h2({ children }) {
-    return (
-      <h2 className="max-w-[65ch] text-xl font-extrabold tracking-tight text-foreground">
-        {children}
-      </h2>
-    );
-  },
-  h3({ children }) {
-    return (
-      <h3 className="max-w-[65ch] text-lg font-extrabold tracking-tight text-foreground">
-        {children}
-      </h3>
     );
   },
   blockquote({ children }) {
@@ -147,12 +172,6 @@ const markdownComponents: Components = {
   },
 };
 
-const pillHeading: Components["h2"] = ({ children }) => (
-  <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide text-foreground">
-    {children}
-  </h2>
-);
-
 export function ArticleBody({
   content,
   empty = "这篇文章还在整理中。",
@@ -172,10 +191,27 @@ export function ArticleBody({
     );
   }
 
-  const components =
+  const toc = extractMarkdownToc(content);
+  let headingIndex = 0;
+  const nextId = () => toc[headingIndex++]?.id;
+  const headings = headingComponents(nextId);
+  const components: Components =
     heading === "pill"
-      ? { ...markdownComponents, h2: pillHeading }
-      : markdownComponents;
+      ? {
+          ...markdownComponents,
+          ...headings,
+          h2({ children }) {
+            return (
+              <h2
+                id={nextId()}
+                className="inline-flex scroll-mt-24 items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide text-foreground"
+              >
+                {children}
+              </h2>
+            );
+          },
+        }
+      : { ...markdownComponents, ...headings };
 
   return (
     <div className={className}>

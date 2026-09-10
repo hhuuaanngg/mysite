@@ -3,7 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/ArticleBody";
+import { TableOfContents } from "@/components/TableOfContents";
+import type { Article } from "@/lib/article-types";
 import { getArticleDocument, getArticles, markdownStartsWithImage } from "@/lib/articles";
+import { extractMarkdownToc } from "@/lib/markdown-toc";
 import { site } from "@/content/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -34,6 +37,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function ArticlePager({
+  newer,
+  older,
+}: {
+  newer?: Article;
+  older?: Article;
+}) {
+  return (
+    <nav className="mt-16 flex flex-wrap items-start justify-between gap-4 border-t border-border pt-8 text-sm font-bold">
+      {newer ? (
+        <Link
+          href={`/articles/${newer.slug}`}
+          className="max-w-[46%] text-accent hover:underline"
+        >
+          ← {newer.title}
+        </Link>
+      ) : (
+        <span />
+      )}
+      {older ? (
+        <Link
+          href={`/articles/${older.slug}`}
+          className="max-w-[46%] text-right text-accent hover:underline"
+        >
+          {older.title} →
+        </Link>
+      ) : (
+        <span />
+      )}
+    </nav>
+  );
+}
+
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
   const article = getArticleDocument(slug);
@@ -44,9 +80,10 @@ export default async function ArticlePage({ params }: Props) {
   const newer = index > 0 ? articles[index - 1] : undefined;
   const older =
     index >= 0 && index < articles.length - 1 ? articles[index + 1] : undefined;
+  const toc = extractMarkdownToc(article.content);
 
   return (
-    <article className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-8 sm:py-16">
+    <article className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <p className="text-sm font-bold text-subtle">
         <Link href="/#articles" className="hover:text-foreground">
           ← 文章
@@ -71,7 +108,7 @@ export default async function ArticlePage({ params }: Props) {
       </header>
 
       {article.cover && !markdownStartsWithImage(article.content) ? (
-        <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-card paper-shadow">
+        <div className="relative mt-10 aspect-[16/9] max-w-3xl overflow-hidden rounded-3xl border border-border bg-card paper-shadow">
           <Image
             src={article.cover}
             alt=""
@@ -83,30 +120,20 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       ) : null}
 
-      <ArticleBody content={article.content} />
-
-      <nav className="mt-16 flex flex-wrap items-start justify-between gap-4 border-t border-border pt-8 text-sm font-bold">
-        {newer ? (
-          <Link
-            href={`/articles/${newer.slug}`}
-            className="max-w-[46%] text-accent hover:underline"
-          >
-            ← {newer.title}
-          </Link>
-        ) : (
-          <span />
-        )}
-        {older ? (
-          <Link
-            href={`/articles/${older.slug}`}
-            className="max-w-[46%] text-right text-accent hover:underline"
-          >
-            {older.title} →
-          </Link>
-        ) : (
-          <span />
-        )}
-      </nav>
+      {toc.length > 0 ? (
+        <div className="mt-10 grid gap-12 md:grid-cols-[minmax(0,1fr)_16rem]">
+          <div>
+            <ArticleBody content={article.content} className="space-y-6" />
+            <ArticlePager newer={newer} older={older} />
+          </div>
+          <TableOfContents items={toc} />
+        </div>
+      ) : (
+        <div className="mt-10 max-w-3xl">
+          <ArticleBody content={article.content} className="space-y-6" />
+          <ArticlePager newer={newer} older={older} />
+        </div>
+      )}
     </article>
   );
 }

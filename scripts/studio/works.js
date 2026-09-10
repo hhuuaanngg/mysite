@@ -5,6 +5,11 @@ import {
   toggleLinePrefix,
   wrapSelection,
 } from "./format.mjs";
+import {
+  COVER_PALETTES,
+  DEFAULT_PALETTE_ID,
+  resolveCoverPalette,
+} from "./cover-palettes.mjs";
 
 const form = document.querySelector("#work-form");
 const listEl = document.querySelector("#work-list");
@@ -19,18 +24,17 @@ const stackEl = document.querySelector("#work-stack");
 const repoEl = document.querySelector("#work-repo");
 const urlEl = document.querySelector("#work-url");
 const markEl = document.querySelector("#work-mark");
-const fromEl = document.querySelector("#work-from");
-const toEl = document.querySelector("#work-to");
-const accentEl = document.querySelector("#work-accent");
-const fromPicker = document.querySelector("#work-from-picker");
-const toPicker = document.querySelector("#work-to-picker");
-const accentPicker = document.querySelector("#work-accent-picker");
+const palettesEl = document.querySelector("#work-palettes");
 const statusEl = document.querySelector("#work-status");
 const deleteBtn = document.querySelector("#work-delete-btn");
 const previewLink = document.querySelector("#work-preview-link");
 const coverPreview = document.querySelector("#work-cover-preview");
 const coverMark = document.querySelector("#work-cover-mark");
 const coverYear = document.querySelector("#work-cover-year");
+const coverImageEl = document.querySelector("#work-cover-image");
+const coverPreviewImage = document.querySelector("#work-cover-preview-image");
+const coverCopy = document.querySelector("#work-cover-copy");
+const coverClear = document.querySelector("#work-cover-clear");
 const openSiteLink = document.querySelector("[data-open-site]");
 const inlineImageInput = document.querySelector("#work-inline-image-input");
 const toolbar = document.querySelector("#work-toolbar");
@@ -39,12 +43,7 @@ function siteOrigin() {
   return (openSiteLink?.href || "http://127.0.0.1:5680").replace(/\/$/, "");
 }
 
-const DEFAULT_COVER = {
-  mark: "",
-  from: "#fde8d8",
-  to: "#f7c9b4",
-  accent: "#c4552a",
-};
+const DEFAULT_COVER = COVER_PALETTES.find((item) => item.id === DEFAULT_PALETTE_ID);
 
 const DEFAULT_BODY = `## 问题
 
@@ -92,6 +91,10 @@ const state = {
   previousSlug: "",
   slugTouched: false,
   order: null,
+  paletteId: DEFAULT_PALETTE_ID,
+  coverBlob: null,
+  coverKeep: false,
+  coverSrc: "",
 };
 
 function setStatus(text, kind = "") {
@@ -114,11 +117,6 @@ function markFromTitle(value) {
   const slug = slugify(value);
   if (slug) return slug.slice(0, 2);
   return String(value).replace(/\s+/g, "").slice(0, 2);
-}
-
-function normalizeHex(value, fallback) {
-  const hex = String(value || "").trim();
-  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex.toLowerCase() : fallback;
 }
 
 function mediaUrl(src) {
@@ -224,17 +222,59 @@ async function insertImagesAtCursor(files) {
   applyEdit({ value, start, end });
 }
 
+function currentPalette() {
+  return (
+    COVER_PALETTES.find((item) => item.id === state.paletteId) || DEFAULT_COVER
+  );
+}
+
+function renderPalettes() {
+  palettesEl.replaceChildren();
+  for (const palette of COVER_PALETTES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `palette${palette.id === state.paletteId ? " active" : ""}`;
+    button.dataset.id = palette.id;
+    button.title = palette.label;
+    button.setAttribute("role", "option");
+    button.setAttribute("aria-selected", palette.id === state.paletteId ? "true" : "false");
+    button.style.background = `linear-gradient(155deg, ${palette.from} 0%, ${palette.to} 100%)`;
+    const mark = document.createElement("span");
+    mark.textContent = palette.label;
+    mark.style.color = palette.accent;
+    button.append(mark);
+    button.addEventListener("click", () => {
+      state.paletteId = palette.id;
+      renderPalettes();
+      updateCoverPreview();
+    });
+    palettesEl.append(button);
+  }
+}
+
 function updateCoverPreview() {
-  const from = normalizeHex(fromEl.value, DEFAULT_COVER.from);
-  const to = normalizeHex(toEl.value, DEFAULT_COVER.to);
-  const accent = normalizeHex(accentEl.value, DEFAULT_COVER.accent);
-  coverPreview.style.background = `linear-gradient(155deg, ${from} 0%, ${to} 100%)`;
+  const palette = currentPalette();
+  const hasImage = Boolean(state.coverSrc);
+  coverPreview.classList.toggle("has-image", hasImage);
+  coverPreview.style.background = `linear-gradient(155deg, ${palette.from} 0%, ${palette.to} 100%)`;
   coverMark.textContent = markEl.value.trim() || "aa";
-  coverMark.style.color = accent;
+  coverMark.style.color = palette.accent;
   coverYear.textContent = yearEl.value.trim() || "年份";
-  fromPicker.value = from;
-  toPicker.value = to;
-  accentPicker.value = accent;
+  if (hasImage) {
+    coverPreviewImage.src = mediaUrl(state.coverSrc);
+    coverPreviewImage.hidden = false;
+    coverImageEl.src = mediaUrl(state.coverSrc);
+    coverImageEl.hidden = false;
+    coverCopy.hidden = true;
+    coverClear.hidden = false;
+  } else {
+    coverPreviewImage.hidden = true;
+    coverPreviewImage.src = "";
+    coverImageEl.hidden = true;
+    coverImageEl.src = "";
+    coverCopy.hidden = false;
+    coverClear.hidden = true;
+  }
 }
 
 function highlight(slug) {
@@ -247,6 +287,10 @@ function resetForm() {
   state.previousSlug = "";
   state.slugTouched = false;
   state.order = null;
+  state.paletteId = DEFAULT_PALETTE_ID;
+  state.coverBlob = null;
+  state.coverKeep = false;
+  state.coverSrc = "";
   titleEl.value = "";
   slugEl.value = "";
   yearEl.value = String(new Date().getFullYear());
@@ -257,11 +301,9 @@ function resetForm() {
   repoEl.value = "";
   urlEl.value = "";
   markEl.value = "";
-  fromEl.value = DEFAULT_COVER.from;
-  toEl.value = DEFAULT_COVER.to;
-  accentEl.value = DEFAULT_COVER.accent;
   deleteBtn.hidden = true;
   previewLink.hidden = true;
+  renderPalettes();
   updateCoverPreview();
   updateMarkdownPreview();
   setStatus("填好后点「保存到仓库」，会生成 src/content/works/<slug>.md。");
@@ -303,24 +345,22 @@ async function loadWork(slug) {
   repoEl.value = work.repo || "";
   urlEl.value = work.url || "";
   markEl.value = work.cover?.mark || "";
-  fromEl.value = work.cover?.from || DEFAULT_COVER.from;
-  toEl.value = work.cover?.to || DEFAULT_COVER.to;
-  accentEl.value = work.cover?.accent || DEFAULT_COVER.accent;
+  try {
+    state.paletteId = resolveCoverPalette(work.cover).id;
+  } catch {
+    state.paletteId = DEFAULT_PALETTE_ID;
+  }
+  state.coverBlob = null;
+  state.coverKeep = Boolean(work.cover?.image);
+  state.coverSrc = work.cover?.image || "";
   deleteBtn.hidden = false;
   previewLink.hidden = false;
   previewLink.href = `${siteOrigin()}/work/${work.slug}/`;
+  renderPalettes();
   updateCoverPreview();
   updateMarkdownPreview();
   highlight(work.slug);
   setStatus(`正在编辑 ${work.slug}`);
-}
-
-function bindColor(picker, field) {
-  picker.addEventListener("input", () => {
-    field.value = picker.value;
-    updateCoverPreview();
-  });
-  field.addEventListener("input", updateCoverPreview);
 }
 
 titleEl.addEventListener("input", () => {
@@ -341,9 +381,46 @@ markEl.addEventListener("input", () => {
 });
 
 yearEl.addEventListener("input", updateCoverPreview);
-bindColor(fromPicker, fromEl);
-bindColor(toPicker, toEl);
-bindColor(accentPicker, accentEl);
+
+function bindDrop(el, onFiles) {
+  el.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    el.classList.add("over");
+  });
+  el.addEventListener("dragleave", () => el.classList.remove("over"));
+  el.addEventListener("drop", (event) => {
+    event.preventDefault();
+    el.classList.remove("over");
+    onFiles(event.dataTransfer?.files);
+  });
+}
+
+async function setCoverFile(file) {
+  if (!file) return;
+  const uploaded = await uploadFile(file);
+  state.coverBlob = uploaded.id;
+  state.coverKeep = false;
+  state.coverSrc = uploaded.src;
+  updateCoverPreview();
+}
+
+document.querySelector("#work-cover-input").addEventListener("change", async (event) => {
+  const file = event.target.files?.[0];
+  await setCoverFile(file);
+  event.target.value = "";
+});
+
+bindDrop(document.querySelector("#work-cover-drop"), async (files) => {
+  const file = [...(files || [])].find((item) => item.type.startsWith("image/"));
+  await setCoverFile(file);
+});
+
+coverClear.addEventListener("click", () => {
+  state.coverBlob = null;
+  state.coverKeep = false;
+  state.coverSrc = "";
+  updateCoverPreview();
+});
 
 bodyEl.addEventListener("input", updateMarkdownPreview);
 bodyEl.addEventListener("scroll", () => {
@@ -419,9 +496,10 @@ form.addEventListener("submit", async (event) => {
       url: urlEl.value.trim(),
       cover: {
         mark: markEl.value.trim(),
-        from: fromEl.value.trim(),
-        to: toEl.value.trim(),
-        accent: accentEl.value.trim(),
+        palette: state.paletteId,
+        ...(state.coverBlob
+          ? { blob: state.coverBlob }
+          : { keep: state.coverKeep }),
       },
     };
     const { work } = await api("/api/works", {
@@ -432,7 +510,11 @@ form.addEventListener("submit", async (event) => {
     state.previousSlug = work.slug;
     state.order = work.order;
     bodyEl.value = work.body;
+    state.coverBlob = null;
+    state.coverKeep = Boolean(work.cover?.image);
+    state.coverSrc = work.cover?.image || "";
     updateMarkdownPreview();
+    updateCoverPreview();
     deleteBtn.hidden = false;
     previewLink.hidden = false;
     previewLink.href = `${siteOrigin()}${work.preview}`;
