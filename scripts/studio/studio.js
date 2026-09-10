@@ -62,7 +62,7 @@ const state = {
   gallery: [],
 };
 
-let siteOrigin = (openSiteLink?.href || "http://127.0.0.1:3100").replace(/\/$/, "");
+let siteOrigin = (openSiteLink?.href || "http://127.0.0.1:5680").replace(/\/$/, "");
 
 function setStatus(text, kind = "") {
   statusEl.textContent = text;

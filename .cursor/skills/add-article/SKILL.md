@@ -8,9 +8,9 @@ description: Add or edit a site article in the local visual studio or with new:a
 优先让用户用本机可视化「内容工坊」，不要改 TypeScript / 组件。
 
 1. 确认 `npm run dev` 在跑（会同时启动工坊）
-2. 打开 http://127.0.0.1:4310#articles 或站点导航里的「写内容」
+2. 打开 http://127.0.0.1:5681#articles 或站点导航里的「写内容」
 3. 填标题、slug、分类、摘要，拖入封面和相册，点「保存到仓库」
-4. 预览 http://127.0.0.1:3100/articles/<slug>/
+4. 预览 http://127.0.0.1:5680/articles/<slug>/
 5. 提交 git 即发布。不要从工坊里执行 git 推送，除非用户明确要求。
 
 命令行备选：

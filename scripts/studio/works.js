@@ -36,7 +36,7 @@ const inlineImageInput = document.querySelector("#work-inline-image-input");
 const toolbar = document.querySelector("#work-toolbar");
 
 function siteOrigin() {
-  return (openSiteLink?.href || "http://127.0.0.1:3100").replace(/\/$/, "");
+  return (openSiteLink?.href || "http://127.0.0.1:5680").replace(/\/$/, "");
 }
 
 const DEFAULT_COVER = {
