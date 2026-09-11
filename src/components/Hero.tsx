@@ -71,7 +71,7 @@ export function Hero() {
           />
           <Image
             src="/illustrations/hero-crew.png"
-            alt="Notion 风格卡通人物：写代码、挥手打招呼、坐在便签上喝咖啡"
+            alt="同一个 Notion 风格男生：写代码、挥手打招呼、坐在便签上喝咖啡，身边有金毛和金渐层猫咪"
             width={1536}
             height={1024}
             priority
