@@ -6,11 +6,11 @@
     "dev": "node scripts/dev.mjs",
     "dev:next": "next dev",
     "studio": "node scripts/studio-server.mjs",
-    "build": "next build",
+    "build": "node scripts/build.mjs",
     "start": "next start",
     "lint": "eslint",
     "new:article": "node scripts/new-article.mjs",
-    "test": "node --test scripts/article-store.test.mjs scripts/new-article.test.mjs scripts/studio/format.test.mjs scripts/ports.test.mjs scripts/work-store.test.mjs scripts/studio-server.test.mjs scripts/markdown-toc.test.mjs"
+    "test": "node --test scripts/article-store.test.mjs scripts/new-article.test.mjs scripts/studio/format.test.mjs scripts/ports.test.mjs scripts/work-store.test.mjs scripts/studio-server.test.mjs scripts/markdown-toc.test.mjs scripts/publishing.test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -20,7 +20,9 @@
     "react-dom": "19.2.8",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "server-only": "^0.0.1"
+    "remark-parse": "^11.0.0",
+    "server-only": "^0.0.1",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

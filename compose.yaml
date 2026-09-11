@@ -1,0 +1,26 @@
+name: mysite-local
+services:
+  studio:
+    build: .
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5780:5780"
+      - "127.0.0.1:5781:5781"
+    environment:
+      TZ: Asia/Shanghai
+      SITE_PORT: "5780"
+      STUDIO_PORT: "5781"
+      STUDIO_BIND_HOST: "0.0.0.0"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./src/content/articles:/app/src/content/articles
+      - ./src/content/works:/app/src/content/works
+      - ./public:/app/public
+      - ./.studio:/app/.studio
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5781/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3

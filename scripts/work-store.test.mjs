@@ -186,6 +186,46 @@ test("repo works files load in original display order", () => {
       "iplay-theme",
       "custom-html-code",
       "theme-2c",
+      "frp3",
     ],
   );
 });
+
+function snapshot(root) {
+  return Object.fromEntries(fs.readdirSync(root, { recursive: true }).filter((name) => fs.statSync(path.join(root, name)).isFile()).sort().map((name) => [name, fs.readFileSync(path.join(root, name)).toString('base64')]));
+}
+
+const photoBlobs = new Map([
+  ['a', { buffer: Buffer.from('A'), ext: '.png' }],
+  ['b', { buffer: Buffer.from('B'), ext: '.png' }],
+  ['cover', { buffer: Buffer.from('COVER'), ext: '.png' }],
+]);
+
+test("reordering work images and resaving preserves their bytes and the original cover", (t) => {
+  const root = makeTree();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  saveWork(root, { ...sample, body: '![A](/__blob__/a.png)\n\n![B](/__blob__/b.png)' }, photoBlobs);
+  const reordered = saveWork(root, { ...sample, previousSlug: sample.slug, body: '![B](/works/gallery/demo-work/02.png)\n\n![A](/works/gallery/demo-work/01.png)' });
+  assert.match(reordered.body, /!\[B\]\(\/works\/gallery\/demo-work\/01.png\)/);
+  assert.match(reordered.body, /!\[A\]\(\/works\/gallery\/demo-work\/02.png\)/);
+  saveWork(root, { ...sample, previousSlug: sample.slug, body: reordered.body });
+  assert.equal(fs.readFileSync(path.join(root, 'public/works/gallery/demo-work/01.png'), 'utf8'), 'B');
+  assert.equal(fs.readFileSync(path.join(root, 'public/works/gallery/demo-work/02.png'), 'utf8'), 'A');
+  assert.equal(fs.readFileSync(path.join(root, 'public', reordered.cover.image), 'utf8'), 'A');
+});
+
+for (const [name, patch, expected] of [
+  ['invalid URL', { repo: 'ftp://example.com', cover: { ...sample.cover, blob: 'cover' } }, /http/],
+  ['invalid palette', { cover: { ...sample.cover, from: 'red', keep: false } }, /封面配色/],
+  ['missing cover upload', { cover: { ...sample.cover, blob: 'missing' } }, /封面/],
+  ['missing body', { body: '', problem: '', solution: '', highlights: '' }, /正文/],
+]) {
+  test(`rejected work save (${name}) leaves all existing files unchanged`, (t) => {
+    const root = makeTree();
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    saveWork(root, { ...sample, cover: { ...sample.cover, blob: 'cover' }, body: '![A](/__blob__/a.png)\n\n![B](/__blob__/b.png)' }, photoBlobs);
+    const before = snapshot(root);
+    assert.throws(() => saveWork(root, { ...sample, previousSlug: sample.slug, body: '![B](/works/gallery/demo-work/02.png)', ...patch }, photoBlobs), expected);
+    assert.deepEqual(snapshot(root), before);
+  });
+}

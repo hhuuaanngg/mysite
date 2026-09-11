@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { extractMarkdownToc } from "@/lib/markdown-toc";
+import { remarkHeadingIds } from "@/lib/markdown-toc";
 
 function imageCaption(alt: string) {
   const value = alt.trim();
@@ -25,35 +25,35 @@ function isImageOnlyParagraph(node: { children?: unknown[] } | undefined) {
   return only.type === "element" && only.tagName === "img";
 }
 
-function headingComponents(getId: () => string | undefined): Pick<
+function headingComponents(): Pick<
   Components,
   "h1" | "h2" | "h3"
 > {
   return {
-    h1({ children }) {
+    h1({ children, id }) {
       return (
         <h1
-          id={getId()}
+          id={id}
           className="max-w-[65ch] scroll-mt-24 text-2xl font-extrabold tracking-tight text-foreground"
         >
           {children}
         </h1>
       );
     },
-    h2({ children }) {
+    h2({ children, id }) {
       return (
         <h2
-          id={getId()}
+          id={id}
           className="max-w-[65ch] scroll-mt-24 text-xl font-extrabold tracking-tight text-foreground"
         >
           {children}
         </h2>
       );
     },
-    h3({ children }) {
+    h3({ children, id }) {
       return (
         <h3
-          id={getId()}
+          id={id}
           className="max-w-[65ch] scroll-mt-24 text-lg font-extrabold tracking-tight text-foreground"
         >
           {children}
@@ -191,19 +191,16 @@ export function ArticleBody({
     );
   }
 
-  const toc = extractMarkdownToc(content);
-  let headingIndex = 0;
-  const nextId = () => toc[headingIndex++]?.id;
-  const headings = headingComponents(nextId);
+  const headings = headingComponents();
   const components: Components =
     heading === "pill"
       ? {
           ...markdownComponents,
           ...headings,
-          h2({ children }) {
+          h2({ children, id }) {
             return (
               <h2
-                id={nextId()}
+                id={id}
                 className="inline-flex scroll-mt-24 items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide text-foreground"
               >
                 {children}
@@ -215,7 +212,7 @@ export function ArticleBody({
 
   return (
     <div className={className}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkHeadingIds]} components={components}>
         {content}
       </ReactMarkdown>
     </div>

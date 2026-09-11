@@ -149,6 +149,14 @@ export function parseMarkdownImages(markdown) {
   return matches;
 }
 
+// Resolve every source against the original text, never against earlier replacements.
+export function rewriteMarkdownImages(markdown, resolveSource) {
+  return markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (raw, alt, source) => {
+    const next = resolveSource(source.trim());
+    return next ? `![${alt}](${next})` : raw;
+  });
+}
+
 function buildMarkdown({ title, date, category, summary, cover, body }) {
   return `---
 title: ${yamlQuote(title)}
@@ -293,11 +301,7 @@ export function saveArticle(root, input, blobs = new Map()) {
     srcMap.set(image.src, publicPath);
   });
 
-  let body = bodyIn;
-  for (const [from, to] of srcMap) {
-    if (from === to) continue;
-    body = body.split(from).join(to);
-  }
+  let body = rewriteMarkdownImages(bodyIn, (src) => srcMap.get(src));
 
   if (galleryPublic.length > 0 && !/!\[[^\]]*\]\(/m.test(body)) {
     body = `${body.trim()}\n\n${galleryPublic

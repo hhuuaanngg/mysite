@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local article drafts
 /drafts/
+
+# Local publishing credentials, snapshots and backups (back up separately).
+/.studio/

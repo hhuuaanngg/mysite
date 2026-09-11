@@ -5,6 +5,7 @@ import {
   BLOB_PREFIX,
   assertSlug,
   parseMarkdownImages,
+  rewriteMarkdownImages,
   slugify,
 } from "./article-store.mjs";
 import { resolveCoverPalette } from "./studio/cover-palettes.mjs";
@@ -326,12 +327,12 @@ function rewriteBodyImages(root, slug, bodyIn, blobs) {
     srcMap.set(image.src, publicPath);
   });
 
-  let body = bodyIn;
-  for (const [from, to] of srcMap) {
-    if (from === to) continue;
-    body = body.split(from).join(to);
-  }
+  const body = rewriteMarkdownImages(bodyIn, (src) => srcMap.get(src));
 
+  return { body: body.trim(), galleryPublic };
+}
+
+function writeGallery(root, slug, galleryPublic) {
   const galleryRoot = galleryDir(root, slug);
   const previousGalleryFiles = fs.existsSync(galleryRoot)
     ? fs.readdirSync(galleryRoot).map((name) => path.join(galleryRoot, name))
@@ -349,7 +350,7 @@ function rewriteBodyImages(root, slug, bodyIn, blobs) {
   }
   removeDirIfEmpty(galleryRoot);
 
-  return { body: body.trim(), files: written };
+  return written;
 }
 
 export function saveWork(root, input, blobs = new Map()) {
@@ -368,7 +369,7 @@ export function saveWork(root, input, blobs = new Map()) {
   const previous =
     previousSlug && previousSlug !== slug ? readWork(root, previousSlug) : existing;
   const order = asOrder(input.order) ?? previous?.order ?? nextOrder(root);
-  const { body, files: imageFiles } = rewriteBodyImages(
+  const { body, galleryPublic } = rewriteBodyImages(
     root,
     slug,
     composeWorkBody({ ...input, title }),
@@ -376,19 +377,15 @@ export function saveWork(root, input, blobs = new Map()) {
   );
 
   let coverImage = "";
+  let coverWrite;
   const coverInput = input.cover && typeof input.cover === "object" ? input.cover : {};
   if (coverInput.blob) {
     const blob = blobs.get(coverInput.blob);
     if (!blob) throw new Error("找不到刚上传的封面");
     const coverExt = normalizeExt(blob.ext || coverInput.ext);
     const coverPath = path.join(publicWorksDir(root), `${slug}${coverExt}`);
-    fs.mkdirSync(path.dirname(coverPath), { recursive: true });
-    fs.writeFileSync(coverPath, blob.buffer);
+    coverWrite = { path: coverPath, buffer: blob.buffer };
     coverImage = `/works/${slug}${coverExt}`;
-    imageFiles.push(path.relative(root, coverPath));
-    for (const leftover of listWorkCoverFiles(root, slug)) {
-      if (leftover !== coverPath) fs.unlinkSync(leftover);
-    }
   } else if (coverInput.keep !== false) {
     const fromSlug = previousSlug || slug;
     const previousCover =
@@ -401,17 +398,8 @@ export function saveWork(root, input, blobs = new Map()) {
     if (coverFile) {
       const coverExt = normalizeExt(path.extname(coverFile));
       const coverPath = path.join(publicWorksDir(root), `${slug}${coverExt}`);
-      fs.mkdirSync(path.dirname(coverPath), { recursive: true });
-      if (coverFile !== coverPath) fs.copyFileSync(coverFile, coverPath);
+      coverWrite = { path: coverPath, buffer: fs.readFileSync(coverFile) };
       coverImage = `/works/${slug}${coverExt}`;
-      imageFiles.push(path.relative(root, coverPath));
-      for (const leftover of listWorkCoverFiles(root, slug)) {
-        if (leftover !== coverPath) fs.unlinkSync(leftover);
-      }
-    }
-  } else {
-    for (const leftover of listWorkCoverFiles(root, slug)) {
-      fs.unlinkSync(leftover);
     }
   }
 
@@ -434,6 +422,22 @@ export function saveWork(root, input, blobs = new Map()) {
     },
   });
 
+  // Finish reading and validating everything before changing any existing asset.
+  const otherFeatured = work.featured
+    ? listWorks(root).filter((other) => other.slug !== work.slug && other.featured)
+    : [];
+  const imageFiles = writeGallery(root, slug, galleryPublic);
+  if (coverWrite) {
+    fs.mkdirSync(path.dirname(coverWrite.path), { recursive: true });
+    fs.writeFileSync(coverWrite.path, coverWrite.buffer);
+    imageFiles.push(path.relative(root, coverWrite.path));
+  }
+  if (coverWrite || coverInput.keep === false) {
+    for (const leftover of listWorkCoverFiles(root, slug)) {
+      if (leftover !== coverWrite?.path) fs.unlinkSync(leftover);
+    }
+  }
+
   const dir = worksDir(root);
   fs.mkdirSync(dir, { recursive: true });
   const file = workPath(root, slug);
@@ -445,8 +449,7 @@ export function saveWork(root, input, blobs = new Map()) {
   const files = [path.relative(root, file), ...imageFiles];
 
   if (work.featured) {
-    for (const other of listWorks(root)) {
-      if (other.slug === work.slug || !other.featured) continue;
+    for (const other of otherFeatured) {
       other.featured = false;
       const otherFile = workPath(root, other.slug);
       fs.writeFileSync(otherFile, serializeWork(other));

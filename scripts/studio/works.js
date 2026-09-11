@@ -312,7 +312,7 @@ function resetForm() {
   renderPalettes();
   updateCoverPreview();
   updateMarkdownPreview();
-  setStatus("填好后点「保存到仓库」，会生成 src/content/works/<slug>.md。");
+  setStatus("填好后点「保存草稿」，再到「发布与备份」选择要上线的内容。");
   highlight("");
 }
 
@@ -529,7 +529,7 @@ form.addEventListener("submit", async (event) => {
     previewLink.hidden = false;
     previewLink.href = `${siteOrigin()}${work.preview}`;
     await refreshList(work.slug);
-    setStatus(`已生成 ${work.files.join("、")}。打开预览确认后，提交 git 即可发布。`, "ok");
+    setStatus("草稿已保存在本机。打开预览确认后，到「发布与备份」选择这个作品。", "ok");
   } catch (error) {
     setStatus(error instanceof Error ? error.message : String(error), "err");
   }

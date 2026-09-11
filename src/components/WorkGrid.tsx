@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Pagination } from "@/components/Pagination";
 import { WorkCard } from "@/components/WorkCard";
 import { WORK_PAGE_SIZE, paginate } from "@/lib/pagination";
@@ -7,22 +8,19 @@ import type { Project } from "@/lib/project-types";
 
 export function WorkGrid({
   projects,
-  page,
-  onPageChange,
 }: {
   projects: Project[];
-  page: number;
-  onPageChange: (page: number) => void;
 }) {
-  const { items, totalPages } = paginate(projects, page, WORK_PAGE_SIZE);
-  const featured = items[0];
-  const others = items.slice(1);
+  const [requestedPage, setPage] = useState(1);
+  const { items, page, totalPages } = paginate(projects, requestedPage, WORK_PAGE_SIZE);
+  const featured = page === 1 ? items[0] : undefined;
+  const others = featured ? items.slice(1) : items;
 
   function goTo(next: number) {
-    onPageChange(next);
+    setPage(next);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document
-      .getElementById("work")
+      .getElementById("showcase-heading")
       ?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
   }
 

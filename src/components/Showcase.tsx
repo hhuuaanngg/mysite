@@ -38,37 +38,51 @@ export function Showcase({
   projects: Project[];
 }) {
   const [tab, setTab] = useState<Tab>("work");
-  const [workPage, setWorkPage] = useState(1);
-  const [articlePage, setArticlePage] = useState(1);
 
   useEffect(() => {
+    let scrollFrame = 0;
+    const scrollToHeading = () => {
+      window.cancelAnimationFrame(scrollFrame);
+      scrollFrame = window.requestAnimationFrame(() => {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        document.getElementById("showcase-heading")?.scrollIntoView({
+          block: "start",
+          behavior: reduce ? "auto" : "smooth",
+        });
+      });
+    };
     const apply = () => {
       const next = tabFromHash(window.location.hash);
-      if (next) setTab(next);
+      if (next) {
+        setTab(next);
+        scrollToHeading();
+      }
     };
 
     apply();
     window.addEventListener("hashchange", apply);
 
     const onClick = (event: MouseEvent) => {
-      const target = (event.target as HTMLElement | null)?.closest("a");
-      if (!target) return;
-      const href = target.getAttribute("href") ?? target.href ?? "";
-      if (href.includes("#articles")) {
-        setTab("articles");
-        if (window.location.hash !== "#articles") {
-          history.replaceState(null, "", "#articles");
-        }
-      } else if (href.includes("#work")) {
-        setTab("work");
-        if (window.location.hash !== "#work") {
-          history.replaceState(null, "", "#work");
-        }
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target instanceof Element ? event.target.closest("a") : null;
+      if (!target || target.hasAttribute("download") || (target.target && target.target !== "_self")) return;
+      const url = new URL(target.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || url.search !== window.location.search) return;
+      const next = tabFromHash(url.hash);
+      if (!next) return;
+
+      // Handle same-page navigation here, including repeated clicks on the current hash.
+      event.preventDefault();
+      setTab(next);
+      if (window.location.hash !== url.hash) {
+        history.replaceState(null, "", url.hash);
       }
+      scrollToHeading();
     };
 
     document.addEventListener("click", onClick, true);
     return () => {
+      window.cancelAnimationFrame(scrollFrame);
       window.removeEventListener("hashchange", apply);
       document.removeEventListener("click", onClick, true);
     };
@@ -86,12 +100,11 @@ export function Showcase({
 
   return (
     <section className="relative scroll-mt-20">
-      <div id="work" className="absolute -top-24 h-px w-px" />
-      <div id="articles" className="absolute -top-24 h-px w-px" />
-
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
+          <div id="showcase-heading" className="relative max-w-2xl">
+            <span id="work" aria-hidden="true" className="absolute top-0 h-px w-px" />
+            <span id="articles" aria-hidden="true" className="absolute top-0 h-px w-px" />
             <p className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide text-foreground">
               01 / 精选
             </p>
@@ -147,25 +160,24 @@ export function Showcase({
           </div>
         </div>
 
+        {/* Keep both lists mounted so each retains its own pagination. */}
         <div
           role="tabpanel"
-          id={`panel-${tab}`}
-          aria-labelledby={`tab-${tab}`}
+          id="panel-work"
+          aria-labelledby="tab-work"
+          hidden={tab !== "work"}
           className="mt-10"
         >
-          {tab === "work" ? (
-            <WorkGrid
-              projects={projects}
-              page={workPage}
-              onPageChange={setWorkPage}
-            />
-          ) : (
-            <ArticleList
-              articles={articles}
-              page={articlePage}
-              onPageChange={setArticlePage}
-            />
-          )}
+          <WorkGrid projects={projects} />
+        </div>
+        <div
+          role="tabpanel"
+          id="panel-articles"
+          aria-labelledby="tab-articles"
+          hidden={tab !== "articles"}
+          className="mt-10"
+        >
+          <ArticleList articles={articles} />
         </div>
       </div>
     </section>

@@ -99,3 +99,18 @@ test("saveArticle refuses to overwrite another slug from 新建", () => {
     /已有文章/,
   );
 });
+
+test("reordering and resaving article images preserves distinct image bytes", (t) => {
+  const root = makeTree();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const input = { title: "Photos", slug: "photos", category: "摄影", summary: "Photos", body: "![A](/__blob__/a.png)\n\n![B](/__blob__/b.png)" };
+  const blobs = new Map([['a', { buffer: Buffer.from('A'), ext: '.png' }], ['b', { buffer: Buffer.from('B'), ext: '.png' }]]);
+  saveArticle(root, input, blobs);
+  const saved = saveArticle(root, { ...input, previousSlug: 'photos', body: '![B](/articles/gallery/photos/02.png)\n\n![A](/articles/gallery/photos/01.png)\n\nOriginal path: /articles/gallery/photos/01.png' });
+  assert.match(saved.body, /!\[B\]\(\/articles\/gallery\/photos\/01.png\)/);
+  assert.match(saved.body, /!\[A\]\(\/articles\/gallery\/photos\/02.png\)/);
+  assert.match(saved.body, /Original path: \/articles\/gallery\/photos\/01.png/);
+  saveArticle(root, { ...input, previousSlug: 'photos', body: saved.body });
+  assert.equal(fs.readFileSync(path.join(root, 'public/articles/gallery/photos/01.png'), 'utf8'), 'B');
+  assert.equal(fs.readFileSync(path.join(root, 'public/articles/gallery/photos/02.png'), 'utf8'), 'A');
+});

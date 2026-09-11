@@ -12,6 +12,7 @@ import {
   todayISO,
 } from "./article-store.mjs";
 import { deleteWork, listWorks, readWork, saveWork } from "./work-store.mjs";
+import { createPublisher } from "./publisher.mjs";
 
 import { SITE_ORIGIN, STUDIO_HOST, STUDIO_PORT } from "./ports.mjs";
 
@@ -39,6 +40,8 @@ function send(res, status, body, headers = {}) {
   const payload = Buffer.isBuffer(body) ? body : Buffer.from(body ?? "");
   res.writeHead(status, {
     "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'",
     ...headers,
     "Content-Length": payload.length,
   });
@@ -89,6 +92,7 @@ function parseUrl(req) {
 export function createStudioServer({
   root = ROOT,
   blobDir = fs.mkdtempSync(path.join(os.tmpdir(), "mysite-studio-")),
+  publisher = createPublisher(root),
 } = {}) {
   const blobs = new Map();
 
@@ -96,6 +100,41 @@ export function createStudioServer({
     try {
       const url = parseUrl(req);
       const method = req.method || "GET";
+      const hostname = url.hostname;
+      if (!["127.0.0.1", "localhost", "[::1]"].includes(hostname) ||
+        (req.headers.origin && req.headers.origin !== url.origin) ||
+        req.headers["sec-fetch-site"] === "cross-site") {
+        sendJson(res, 403, { error: "内容工坊只接受本机同源请求" });
+        return;
+      }
+      if (["PUT", "POST"].includes(method) && !url.pathname.startsWith("/api/blobs/") &&
+        !req.headers["content-type"]?.startsWith("application/json")) {
+        sendJson(res, 415, { error: "请使用 JSON 请求" }); return;
+      }
+
+      if (url.pathname === "/api/publishing" && method === "GET") {
+        sendJson(res, 200, publisher.status()); return;
+      }
+      if (url.pathname.startsWith("/api/publishing/") && ["PUT", "POST"].includes(method)) {
+        const payload = JSON.parse((await readBody(req, 200_000)).toString("utf8"));
+        const action = url.pathname.slice("/api/publishing/".length);
+        if (action === "settings" && method === "PUT") sendJson(res, 200, { settings: publisher.configure(payload) });
+        else if (action === "credentials" && method === "PUT") { publisher.credential(payload.type, payload.data); sendJson(res, 200, { ok: true }); }
+        else if (action === "check" && method === "POST") sendJson(res, 200, await publisher.check());
+        else if (action === "start" && method === "POST") { const { id } = await publisher.start(payload); sendJson(res, 202, { id }); }
+        else if (action === "rollback" && method === "POST") sendJson(res, 200, await publisher.revert(payload.id));
+        else if (action === "backup" && method === "POST") sendJson(res, 200, await publisher.backup());
+        else if (action === "recover" && method === "POST") sendJson(res, 200, await publisher.recover());
+        else sendJson(res, 404, { error: "没有这个操作" });
+        return;
+      }
+      const download = url.pathname.match(/^\/api\/publishing\/(artifacts|backups)\/([0-9TZ]+-[a-f0-9]{8})$/);
+      if (download && method === "GET") {
+        const file = download[1] === "artifacts" ? publisher.artifact(download[2]) : publisher.backupFile(download[2]);
+        if (!fs.existsSync(file)) { sendJson(res, 404, { error: "文件尚未生成" }); return; }
+        res.writeHead(200, { "Content-Type": "application/gzip", "Content-Disposition": `attachment; filename="mysite-${download[1]}-${download[2]}.tar.gz"`, "X-Content-Type-Options": "nosniff", "Cache-Control": "no-store" });
+        fs.createReadStream(file).pipe(res); return;
+      }
 
       if (method === "GET" && url.pathname === "/api/health") {
         sendJson(res, 200, { ok: true, site: SITE_ORIGIN });
@@ -133,14 +172,14 @@ export function createStudioServer({
           sendJson(res, 404, { error: "没有这篇文章" });
           return;
         }
-        deleteArticleFiles(root, slug);
+        publisher.mutate(() => deleteArticleFiles(root, slug));
         sendJson(res, 200, { ok: true, slug });
         return;
       }
 
       if (method === "PUT" && url.pathname === "/api/articles") {
         const payload = JSON.parse((await readBody(req, 2_000_000)).toString("utf8"));
-        const saved = saveArticle(root, payload, blobs);
+        const saved = publisher.mutate(() => saveArticle(root, payload, blobs));
         sendJson(res, 200, { ok: true, article: saved });
         return;
       }
@@ -167,14 +206,14 @@ export function createStudioServer({
           sendJson(res, 404, { error: "没有这个作品" });
           return;
         }
-        deleteWork(root, slug);
+        publisher.mutate(() => deleteWork(root, slug));
         sendJson(res, 200, { ok: true, slug });
         return;
       }
 
       if (method === "PUT" && url.pathname === "/api/works") {
         const payload = JSON.parse((await readBody(req, 2_000_000)).toString("utf8"));
-        const saved = saveWork(root, payload, blobs);
+        const saved = publisher.mutate(() => saveWork(root, payload, blobs));
         sendJson(res, 200, { ok: true, work: saved });
         return;
       }
@@ -184,6 +223,7 @@ export function createStudioServer({
         const id = safeBlobId(blobMatch[1]);
         const body = await readBody(req, MAX_BLOB);
         const ext = extFrom(url.searchParams.get("name"), req.headers["content-type"]);
+        if (![".jpg", ".png", ".webp", ".gif"].includes(ext)) throw new Error("仅支持 JPG、PNG、WebP 和 GIF 图片");
         const file = path.join(blobDir, `${id}${ext}`);
         fs.writeFileSync(file, body);
         blobs.set(id, { ext, file, buffer: body });

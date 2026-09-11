@@ -7,6 +7,7 @@ import readline from "node:readline/promises";
 import { pathToFileURL } from "node:url";
 import matter from "gray-matter";
 import { SITE_ORIGIN, STUDIO_ORIGIN } from "./ports.mjs";
+import { rewriteMarkdownImages } from "./article-store.mjs";
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 const COVER_NAMES = new Set(["cover.jpg", "cover.jpeg", "cover.png", "cover.webp"]);
@@ -227,7 +228,7 @@ export function planArticle(options) {
   const coverExt = coverSource
     ? path.extname(coverSource).toLowerCase().replace(".jpeg", ".jpg")
     : ".jpg";
-  const coverPublic = `/articles/${slug}${coverExt}`;
+  const coverPublic = coverSource ? `/articles/${slug}${coverExt}` : "";
   const galleryPublic = gallerySources.map((file, index) => {
     const ext = path.extname(file).toLowerCase().replace(".jpeg", ".jpg");
     const filename = `${padIndex(index + 1, gallerySources.length)}${ext}`;
@@ -238,13 +239,22 @@ export function planArticle(options) {
     };
   });
 
+  const importedImages = new Map(galleryPublic.map((image) => [image.from, image.publicPath]));
+  if (coverSource) importedImages.set(coverSource, coverPublic);
+  const rewriteImportedImages = (body, directory) => rewriteMarkdownImages(body, (src) => {
+    if (/^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(src)) return undefined;
+    return importedImages.get(path.resolve(directory, src));
+  });
   const bodyParts = [
-    ...((options.body ?? []).map((part) => String(part).trim()).filter(Boolean)),
-    draft.body,
+    ...((options.body ?? []).map((part) => rewriteImportedImages(String(part).trim(), imageDir || root)).filter(Boolean)),
+    rewriteImportedImages(draft.body, options.from ? path.resolve(options.from) : root),
   ].filter(Boolean);
   const bodyFile = options["body-file"] || options.bodyFile;
   if (bodyFile) {
-    bodyParts.push(fs.readFileSync(path.resolve(bodyFile), "utf8").trim());
+    bodyParts.push(rewriteImportedImages(
+      fs.readFileSync(path.resolve(bodyFile), "utf8").trim(),
+      path.dirname(path.resolve(bodyFile)),
+    ));
   }
 
   const markdown = buildMarkdown({

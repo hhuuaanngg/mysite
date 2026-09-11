@@ -11,6 +11,24 @@
   --grid: rgb(55 53 47 / 0.05);
 }
 
+[hidden] { display: none !important; }
+.publishing { max-width: 1080px; margin: 32px auto; padding: 0 20px 48px; display: grid; gap: 22px; }
+.publish-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px; }
+.publish-card h2 { font-size: 22px; margin: 8px 0 14px; }
+.publish-card p { line-height: 1.7; }
+.publish-changes { margin: 18px 0; display: grid; gap: 8px; }
+.publish-change { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+.publish-change input { width: 18px; height: 18px; flex: 0 0 auto; }
+.release-row { padding: 18px 0; border-top: 1px solid var(--border); }
+.release-row .ghost { display: inline-block; margin: 4px 8px 4px 0; }
+.release-row pre, .release-error { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; max-height: 230px; overflow: auto; }
+.release-error { color: #a33128; }
+.release-row details { margin-top: 12px; }
+.credentials { margin-top: 22px; }
+.publish-card input { min-width: 0; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 640px) { .publish-card { padding: 18px; } .publishing { padding: 0 12px 24px; } .top { flex-wrap: wrap; } }
+
 * {
   box-sizing: border-box;
 }

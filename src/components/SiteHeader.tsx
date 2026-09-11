@@ -1,19 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
 
 export function SiteHeader({ studioHref }: { studioHref?: string }) {
-  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    let frame = 0;
+    const updateFrost = () => {
+      frame = 0;
+      const progress = Math.min(1, Math.max(0, window.scrollY / 160));
+      headerRef.current?.style.setProperty("--header-progress", String(progress));
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateFrost);
+    };
+    updateFrost();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   useEffect(() => {
@@ -27,11 +38,9 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b transition-colors duration-200 ${
-        scrolled || open
-          ? "border-border bg-background/85 backdrop-blur-md"
-          : "border-transparent bg-transparent"
-      }`}
+      ref={headerRef}
+      data-menu-open={open}
+      className="site-header sticky top-0 z-50 border-b"
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
         <Link

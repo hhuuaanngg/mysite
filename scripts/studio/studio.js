@@ -256,7 +256,7 @@ function resetForm() {
   previewLink.hidden = true;
   renderGallery();
   updatePreview();
-  setStatus("填好后点「保存到仓库」，会生成 md / 封面 / 相册。");
+  setStatus("填好后点「保存草稿」，再到「发布与备份」选择要上线的内容。");
   highlight("");
 }
 
@@ -298,7 +298,7 @@ async function loadArticle(slug) {
   dateEl.value = article.date;
   summaryEl.value = article.summary;
   bodyEl.value = article.body;
-  allowEmptyEl.checked = false;
+  allowEmptyEl.checked = !article.cover;
   if (article.cover) {
     coverPreview.src = mediaUrl(article.cover);
     coverPreview.hidden = false;
@@ -453,7 +453,7 @@ form.addEventListener("submit", async (event) => {
     previewLink.href = `${siteOrigin}${article.preview}`;
     await refreshList(article.slug);
     setStatus(
-      `已生成 ${article.files.join("、")}。打开预览确认后，提交 git 即可发布。`,
+      "草稿已保存在本机。打开预览确认后，到「发布与备份」选择这篇文章。",
       "ok",
     );
   } catch (error) {

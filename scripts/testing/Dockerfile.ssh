@@ -1,0 +1,4 @@
+FROM mysite-local-studio:latest
+RUN apt-get update && apt-get install -y --no-install-recommends openssh-server nginx-light util-linux && rm -rf /var/lib/apt/lists/*
+COPY . /app
+CMD ["node", "scripts/testing/ssh-smoke.mjs"]

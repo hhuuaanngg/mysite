@@ -117,3 +117,31 @@ test("refuses to overwrite an existing slug", () => {
 test("todayISO is YYYY-MM-DD", () => {
   assert.match(todayISO(new Date("2026-09-09T12:00:00")), /^\d{4}-\d{2}-\d{2}$/);
 });
+
+test("allow-empty creates an empty cover field and no image writes", (t) => {
+  const root = makeTree();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const plan = planArticle({ root, title: 'Text', slug: 'text', category: '生活', summary: 'Text', allowEmpty: true });
+  assert.equal(plan.coverPublic, '');
+  assert.match(plan.markdown, /^cover: ""$/m);
+  assert.deepEqual(plan.writes.map((item) => item.kind), ['write']);
+});
+
+test("draft import rewrites relative images to copied assets without changing external URLs", (t) => {
+  const root = makeTree();
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const draft = path.join(root, 'draft');
+  writeJpg(path.join(draft, 'cover.jpg'));
+  writeJpg(path.join(draft, 'a.jpg'));
+  writeJpg(path.join(draft, 'b.jpg'));
+  fs.writeFileSync(path.join(draft, 'article.md'), '---\ntitle: Draft\ncategory: 摄影\nsummary: Draft\n---\n![B](./b.jpg)\n\n![A](a.jpg)\n\n![Cover](cover.jpg)\n\n![Remote](https://example.com/a.jpg)');
+  const plan = planArticle({ root, from: draft });
+  applyPlan(plan);
+  assert.match(plan.markdown, /!\[B\]\(\/articles\/gallery\/draft\/02.jpg\)/);
+  assert.match(plan.markdown, /!\[A\]\(\/articles\/gallery\/draft\/01.jpg\)/);
+  assert.match(plan.markdown, /!\[Cover\]\(\/articles\/draft.jpg\)/);
+  assert.match(plan.markdown, /!\[Remote\]\(https:\/\/example.com\/a.jpg\)/);
+  for (const match of plan.markdown.matchAll(/!\[[^\]]*\]\((\/articles\/[^)]+)\)/g)) {
+    assert.ok(fs.existsSync(path.join(root, 'public', match[1])));
+  }
+});

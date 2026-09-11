@@ -5,7 +5,7 @@ export const site = {
   tagline: "做桌面工具、个人站点与全栈小产品。",
   description:
     "Joey Huang 的个人站点。作品、文章、关于与社交媒体。",
-  url: "https://hjy.me",
+  url: process.env.SITE_URL || "https://hjy.me",
   locale: "zh-CN",
   email: "hhuuaanngg2020@gmail.com",
   github: {

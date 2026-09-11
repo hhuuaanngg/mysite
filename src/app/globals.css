@@ -58,6 +58,19 @@ body {
   background-attachment: fixed;
 }
 
+.site-header {
+  --header-progress: 0;
+  --header-frost: var(--header-progress);
+  background-color: rgb(247 246 243 / calc(0.78 * var(--header-frost)));
+  border-bottom-color: rgb(211 209 203 / calc(0.8 * var(--header-frost)));
+  -webkit-backdrop-filter: blur(calc(16px * var(--header-frost)));
+  backdrop-filter: blur(calc(16px * var(--header-frost)));
+}
+
+.site-header[data-menu-open="true"] {
+  --header-frost: 1;
+}
+
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;

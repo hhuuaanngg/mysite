@@ -1,16 +1,28 @@
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+
 export type TocItem = {
   depth: 1 | 2 | 3;
   text: string;
   id: string;
 };
 
-function headingText(raw: string) {
-  return raw
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/[*_`~]/g, "")
-    .replace(/<\/?[^>]+>/g, "")
-    .trim();
+type MarkdownNode = {
+  type: string;
+  depth?: number;
+  value?: string;
+  alt?: string | null;
+  children?: MarkdownNode[];
+  data?: { hProperties?: Record<string, unknown> };
+};
+
+const parser = unified().use(remarkParse).use(remarkGfm);
+
+function headingText(node: MarkdownNode): string {
+  if (node.type === "html") return "";
+  if (node.type === "image" || node.type === "imageReference") return node.alt ?? "";
+  return node.value ?? node.children?.map(headingText).join("") ?? "";
 }
 
 export function headingAnchor(text: string) {
@@ -24,35 +36,36 @@ export function headingAnchor(text: string) {
   return ascii || "section";
 }
 
-export function extractMarkdownToc(markdown: string): TocItem[] {
+function collectHeadings(tree: MarkdownNode): TocItem[] {
   const items: TocItem[] = [];
-  const used = new Map<string, number>();
-  let inFence = false;
+  const used = new Set<string>();
 
-  for (const line of markdown.split(/\r?\n/)) {
-    if (/^```/.test(line.trim())) {
-      inFence = !inFence;
-      continue;
+  function visit(node: MarkdownNode) {
+    if (node.type === "heading" && node.depth && node.depth <= 3) {
+      const text = headingText(node).trim();
+      const base = headingAnchor(text);
+      let id = base;
+      let suffix = 1;
+      while (used.has(id)) id = `${base}-${suffix++}`;
+      used.add(id);
+      node.data = {
+        ...node.data,
+        hProperties: { ...node.data?.hProperties, id },
+      };
+      items.push({ depth: node.depth as 1 | 2 | 3, text: text || "无标题", id });
     }
-    if (inFence) continue;
-
-    const match = /^(#{1,3})\s+(.+?)\s*#*\s*$/.exec(line);
-    if (!match) continue;
-
-    const text = headingText(match[2]);
-    if (!text) continue;
-
-    let id = headingAnchor(text);
-    const seen = used.get(id) ?? 0;
-    used.set(id, seen + 1);
-    if (seen > 0) id = `${id}-${seen}`;
-
-    items.push({
-      depth: match[1].length as 1 | 2 | 3,
-      text,
-      id,
-    });
+    node.children?.forEach(visit);
   }
 
+  visit(tree);
   return items;
+}
+
+export function extractMarkdownToc(markdown: string): TocItem[] {
+  return collectHeadings(parser.parse(markdown));
+}
+
+// Apply the same IDs to the actual rendering tree, including nested headings.
+export function remarkHeadingIds() {
+  return (tree: MarkdownNode) => { collectHeadings(tree); };
 }

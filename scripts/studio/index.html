@@ -19,6 +19,7 @@
         <nav class="modes" role="tablist" aria-label="内容类型">
           <button type="button" role="tab" data-mode="articles" class="active">文章</button>
           <button type="button" role="tab" data-mode="works">作品</button>
+          <button type="button" role="tab" data-mode="publishing">发布与备份</button>
         </nav>
         <a class="ghost" data-open-site href="http://127.0.0.1:5680/" target="_blank" rel="noreferrer">打开站点</a>
       </div>
@@ -28,12 +29,12 @@
       <aside class="side">
         <div id="article-side">
           <button type="button" class="new" id="new-btn">+ 新建文章</button>
-          <p class="hint">点保存就会写入仓库里的 Markdown、封面和相册。</p>
+          <p class="hint">保存为本地草稿。在「发布与备份」中选择要上线的文章。</p>
           <ul id="article-list" class="list"></ul>
         </div>
         <div id="work-side" hidden>
           <button type="button" class="new" id="new-work-btn">+ 新建作品</button>
-          <p class="hint">点保存就会写入 <code>src/content/works/&lt;slug&gt;.md</code>。</p>
+          <p class="hint">保存为本地草稿。在「发布与备份」中选择要上线的作品。</p>
           <ul id="work-list" class="list"></ul>
         </div>
       </aside>
@@ -125,12 +126,12 @@
           <p id="status" class="status" role="status"></p>
 
           <div class="actions">
-            <button type="submit" class="save" id="save-btn">保存到仓库</button>
+            <button type="submit" class="save" id="save-btn">保存草稿</button>
             <button type="button" class="danger" id="delete-btn" hidden>删除</button>
             <a id="preview-link" class="ghost" hidden target="_blank" rel="noreferrer">打开预览</a>
           </div>
           <p class="footnote">
-            保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
+            保存后可打开本地预览。已上线内容保持原样，选中这份草稿发布后才会更新。
           </p>
         </form>
 
@@ -235,14 +236,69 @@
 
           <p id="work-status" class="status" role="status"></p>
           <div class="actions">
-            <button type="submit" class="save">保存到仓库</button>
+            <button type="submit" class="save">保存草稿</button>
             <button type="button" class="danger" id="work-delete-btn" hidden>删除</button>
             <a id="work-preview-link" class="ghost" hidden target="_blank" rel="noreferrer">打开预览</a>
           </div>
           <p class="footnote">
-            保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
+            保存后可打开本地预览。已上线内容保持原样，选中这份草稿发布后才会更新。
           </p>
         </form>
+      </section>
+    </main>
+    <main id="publishing-panel" class="publishing" hidden>
+      <section class="publish-card">
+        <p class="kicker">01 · 选择内容</p>
+        <h2>把准备好的内容发布出去</h2>
+        <p>先保存文章，再勾选这次要上线的草稿。未勾选的修改继续留在本地，线上保留原来版本。</p>
+        <p class="hint">首次生成包含项目原有内容。重命名会出现一条删除和一条新增，请一起选择。精选作品变化也请一并选择。</p>
+        <button type="button" class="ghost" id="refresh-publishing">刷新清单</button>
+        <div id="publish-changes" class="publish-changes"></div>
+        <div class="actions">
+          <button type="button" class="ghost" id="generate-site">仅生成网站</button>
+          <button type="button" class="save" id="deploy-site">发布到云端</button>
+        </div>
+        <p id="publish-help" class="hint"></p>
+        <p id="publish-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+      <section class="publish-card">
+        <p class="kicker">02 · 发布记录</p>
+        <h2>每次发布都有记录</h2>
+        <p class="hint">「仅生成」可以下载网页包，不会更新云端。回退只切换线上网站，保留你电脑上的草稿。</p>
+        <div id="publish-history"></div>
+        <button type="button" class="ghost" id="recover-publish">核对线上版本 / 恢复中断任务</button>
+        <p class="hint">若发布时断网或电脑重启，先用此按钮核对服务器上的实际版本，再继续发布。</p>
+      </section>
+      <section class="publish-card">
+        <p class="kicker">03 · 保存原稿</p>
+        <h2>给文章留一份独立备份</h2>
+        <p>每次保存和删除前都会留存本地副本。电脑硬盘坏了仍可能丢失，请把备份下载到另一块硬盘或云盘。</p>
+        <button type="button" class="ghost" id="backup-source">下载原稿与历史备份</button>
+        <p id="backup-status" class="status" role="status"></p>
+        <p class="hint">备份包含文章、图片、网站源码和发布历史；不包含 SSH 私钥及服务器设置。</p>
+      </section>
+      <section class="publish-card">
+        <p class="kicker">首次使用 · 设置一次</p>
+        <h2>连接你的 Linux 服务器</h2>
+        <form id="publish-settings">
+          <div class="row">
+            <label>服务器 IP / 主机名<input name="host" required placeholder="例如服务器公网 IP" autocomplete="off" /></label>
+            <label>SSH 用户名<input name="user" required placeholder="deploy" autocomplete="off" /></label>
+          </div>
+          <div class="row">
+            <label>SSH 端口<input name="port" type="number" min="1" max="65535" value="22" required /></label>
+            <label>独立发布目录<input name="remotePath" required placeholder="/srv/mysite" /></label>
+          </div>
+          <label>网站地址<input name="siteUrl" type="url" required placeholder="https://hjy.me" /></label>
+          <p class="hint">服务器需安装 rsync，并让网站服务的根目录指向发布目录下的 current（例如 /srv/mysite/current）。首次使用请选一个空的发布目录。</p>
+          <div class="actions"><button class="save" type="submit">保存设置</button><button class="ghost" type="button" id="check-server">测试连接</button></div>
+        </form>
+        <div class="row credentials">
+          <label>专用 SSH 私钥文件<input id="ssh-key-file" type="file" /><span class="hint" id="ssh-key-state"></span></label>
+          <label>已核验的服务器指纹（known_hosts）<input id="ssh-hosts-file" type="file" /><span class="hint" id="ssh-hosts-state"></span></label>
+        </div>
+        <p class="hint">使用仅用于此站点的免口令密钥。私钥只保存在本机，不进入网页包、Git 或原稿备份。服务器指纹请先通过可信渠道核验。</p>
+        <p id="settings-status" class="status" role="status"></p>
       </section>
     </main>
     <script src="/app.js" type="module"></script>

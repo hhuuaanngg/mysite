@@ -1,70 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import ts from "typescript";
 
-const source = readFileSync(
-  join(dirname(fileURLToPath(import.meta.url)), "../src/lib/markdown-toc.ts"),
-  "utf8",
+// Exercise the production module without requiring Node's TypeScript loader.
+const source = readFileSync(new URL("../src/lib/markdown-toc.ts", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 },
+}).outputText.replace(/from "([^"]+)"/g, (_, name) => `from "${import.meta.resolve(name)}"`);
+const { extractMarkdownToc, remarkHeadingIds } = await import(
+  `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`
 );
-
-function headingText(raw) {
-  return raw
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/[*_`~]/g, "")
-    .replace(/<\/?[^>]+>/g, "")
-    .trim();
-}
-
-function headingAnchor(text) {
-  const ascii = text
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-  return ascii || "section";
-}
-
-function extractMarkdownToc(markdown) {
-  const items = [];
-  const used = new Map();
-  let inFence = false;
-
-  for (const line of markdown.split(/\r?\n/)) {
-    if (/^```/.test(line.trim())) {
-      inFence = !inFence;
-      continue;
-    }
-    if (inFence) continue;
-
-    const match = /^(#{1,3})\s+(.+?)\s*#*\s*$/.exec(line);
-    if (!match) continue;
-
-    const text = headingText(match[2]);
-    if (!text) continue;
-
-    let id = headingAnchor(text);
-    const seen = used.get(id) ?? 0;
-    used.set(id, seen + 1);
-    if (seen > 0) id = `${id}-${seen}`;
-
-    items.push({
-      depth: match[1].length,
-      text,
-      id,
-    });
-  }
-
-  return items;
-}
-
-test("toc helper source is present", () => {
-  assert.match(source, /export function extractMarkdownToc/);
-});
 
 test("extracts three heading levels and skips fenced code", () => {
   const toc = extractMarkdownToc(`# 大标题
@@ -98,4 +48,17 @@ test("duplicate headings get numbered ids", () => {
   const toc = extractMarkdownToc("## Same\n\n## Same\n");
   assert.equal(toc[0].id, "same");
   assert.equal(toc[1].id, "same-1");
+});
+
+
+test("TOC links match rendered headings for CommonMark syntax", () => {
+  const markdown = "Intro\n=====\n\n## Actual\n\n~~~js\n## Code example\n~~~\n\n> ### Nested\n\n## Same\n\n## Same\n\n## Same-1\n\n## **Bold** &amp; [Link](https://example.com)\n\n##";
+  const toc = extractMarkdownToc(markdown);
+  assert.deepEqual(toc.map(({ text }) => text), ["Intro", "Actual", "Nested", "Same", "Same", "Same-1", "Bold & Link", "无标题"]);
+  assert.equal(new Set(toc.map(({ id }) => id)).size, toc.length);
+  const html = renderToStaticMarkup(React.createElement(ReactMarkdown, {
+    remarkPlugins: [remarkGfm, remarkHeadingIds],
+  }, markdown));
+  const renderedIds = [...html.matchAll(/<h[123] id="([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(renderedIds, toc.map(({ id }) => id));
 });
