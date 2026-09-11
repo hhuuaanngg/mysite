@@ -14,5 +14,8 @@ Astro version and relevant official documentation before changing framework APIs
   behavior does not terminate the studio or orphan the browser test server.
 - Build through `npm run build` or the studio publisher to preserve selected-draft
   isolation. Exported files stay in `out/`; the local studio is not part of that site.
+- Release builds symlink node_modules. Keep Vite caches outside that shared tree
+  and ignore `.studio`/`out` in the dev watcher. Test a real build while preview is
+  running, then reload and verify all hydrated sections in the running Docker site.
 - Run `npm run check`, `npm run lint`, `npm test`, `npm run test:publishing`, and
-  `npm run build`; use `npm run test:e2e` for browser interaction changes.
+  `npm run test:preview`, `npm run build`; use `npm run test:e2e` for browser changes.

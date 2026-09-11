@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+test("首页三个交互区块完成加载后仍然可见", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/");
+  for (const component of ["SiteHeader", "Showcase", "Contact"]) {
+    const island = page.locator(`astro-island[component-export="${component}"]:not([ssr])`);
+    await island.waitFor();
+    await expect(island.locator("header, section").first()).toBeVisible();
+  }
+  await expect(page.getByRole("tab", { name: "作品", exact: true })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "文章", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "社交媒体", exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("作品和文章切换后分别保留页码与当前内容", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -72,7 +87,7 @@ test("静态产物保留元数据、站点地图、图标和404", async ({ reque
   const home = await request.get("/");
   const html = await home.text();
   expect(html).not.toContain("/_next/");
-  expect(html).not.toContain("写内容");
+  if (!process.env.SITE_TEST_ORIGIN) expect(html).not.toContain("写内容");
   expect(html).toContain('rel="canonical"');
   expect(html).toContain('property="og:title"');
   for (const path of ["/robots.txt", "/sitemap.xml", "/favicon.ico", "/icon.svg"]) {

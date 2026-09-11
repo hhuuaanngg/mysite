@@ -13,7 +13,8 @@
     "dev:astro": "astro dev",
     "check": "astro check",
     "test:e2e": "playwright test",
-    "test:publishing": "node --test scripts/astro-publishing.test.mjs"
+    "test:publishing": "node --test scripts/astro-publishing.test.mjs",
+    "test:preview": "node --test scripts/astro-preview.test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

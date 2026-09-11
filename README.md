@@ -56,12 +56,15 @@ npm run check
 npm run lint
 npm test
 npm run test:publishing
+npm run test:preview
 npm run build
 npx playwright install chromium
 npm run test:e2e
 ```
 
 `test:publishing` 使用临时内容执行真正的 Astro 构建，检查已发布正文、选中草稿和未选中草稿的隔离。浏览器测试使用 5690 端口，覆盖桌面和手机的独立分页保留、锚点导航、详情目录、图片、元数据和 404。
+
+`test:preview` 在预览服务运行期间执行发布构建，检查构建不会覆盖预览的 React 依赖缓存。Docker 更新后，还需运行 `SITE_TEST_ORIGIN=http://127.0.0.1:5780 npm run test:e2e` 检查实际运行页面，并在工坊生成网站后再次验证。
 
 迁移说明与验收记录：[Astro 7 迁移验收](docs/astro7-migration-acceptance.md)。
 

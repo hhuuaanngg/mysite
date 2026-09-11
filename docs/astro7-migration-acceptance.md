@@ -2,6 +2,18 @@
 
 日期：2026-09-11。工作分支：`codex/astro7-rebuild`。
 
+## 交付缺陷修复：生成网站后首页交互区块消失
+
+初验遗漏了“预览服务运行时构建，再刷新预览”的场景。Docker 的 22 个 HTTP 200 不能证明客户端区块正常。用户报告后，已在用户实际使用的 5780 内置浏览器页面复现：SiteHeader、Showcase、Contact 的内容全部为空，控制台报 `_jsxDEV is not a function`。
+
+根因是发布构建通过符号链接共享 `node_modules`，Vite 默认缓存也位于此目录。生产构建覆盖开发依赖缓存后，预览页面取到生产版 `react/jsx-dev-runtime`，其中 `jsxDEV` 为 `undefined`，React 接管页面时清空了三个区块。另发现临时快照中的配置文件会触发预览重启。
+
+修复将 Vite 缓存移至每个工作目录独立的 `.astro/vite/development` 或 `.astro/vite/production`，并让开发监听忽略 `.studio` 和 `out`。新增 `test:preview` 真正运行预览和发布构建，断言构建前后开发运行时完全相同；新增三个交互区块完成加载后仍可见的浏览器测试。浏览器测试可通过 `SITE_TEST_ORIGIN` 指向实际 Docker 入口。
+
+后续验收必须包含构建完成后的实际页面交互，不能仅依据构建成功、HTTP 状态或构建前的截图。
+
+本次修复后已在用户当前内置浏览器中验证：作品、文章都切到第 2 页 → Docker 内执行 `npm run build` → 生成后两个列表仍保留各自第 2 页，三个交互区块仍有内容 → 刷新后导航、作品/文章和联系区块继续正常显示。随后针对实际 `http://127.0.0.1:5780` 运行桌面和手机浏览器测试，10 项全部通过；`test:preview` 的并行预览/构建回归、类型检查和 lint 也通过。
+
 ## 交付范围
 
 - Astro 7.3.2、官方 React 6.0.5 集成、React 19.2.8、Tailwind CSS 4。
