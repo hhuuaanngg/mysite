@@ -9,3 +9,7 @@ drafts
 *.tsbuildinfo
 .DS_Store
 coverage
+
+.astro
+test-results
+playwright-report

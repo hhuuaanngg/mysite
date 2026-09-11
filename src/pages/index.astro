@@ -1,0 +1,20 @@
+---
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import { Hero } from "@/components/Hero";
+import { About } from "@/components/About";
+import { Contact } from "@/components/Contact";
+import { Showcase } from "@/components/Showcase";
+import { getArticles } from "@/lib/articles";
+import { getProjectsInDisplayOrder } from "@/lib/projects";
+
+const articles = getArticles();
+const projects = getProjectsInDisplayOrder();
+---
+<SiteLayout>
+  <main>
+    <Hero />
+    <Showcase client:load articles={articles} projects={projects} />
+    <About />
+    <Contact client:load />
+  </main>
+</SiteLayout>

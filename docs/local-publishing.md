@@ -28,7 +28,7 @@ docker compose up -d --build --wait
 
 首次启用将当时项目已有文章和图片复制为初始版本，后续变动才进入草稿清单。如果首次启用前目录里已经有未写完的文章，应先整理原有内容再首次生成。不要删除 `.studio/initial` 或整个 `.studio` 来“清理缓存”，这会丢失发布基线。
 
-`npm run build` 只生成已发布基线（初次为原有内容）到 `out/`。日常使用工坊的生成按钮选择新稿；不要绕过该流程直接执行 `next build`，否则会导出源目录中的全部草稿。
+`npm run build` 只生成已发布基线（初次为原有内容）到 `out/`。日常使用工坊的生成按钮选择新稿；不要绕过该流程直接执行 `astro build`，否则会导出源目录中的全部草稿。
 
 ## 第一次连接云服务器
 
@@ -58,7 +58,7 @@ server {
     location / {
         try_files $uri $uri/ =404;
     }
-    location /_next/static/ {
+    location /_astro/ {
         add_header Cache-Control "public, max-age=31536000, immutable";
     }
     location ~ \.html$ {

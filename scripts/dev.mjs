@@ -1,55 +1,46 @@
-import { spawn } from "node:child_process";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { SITE_ORIGIN, SITE_PORT, STUDIO_ORIGIN, STUDIO_PORT } from "./ports.mjs";
-import { startStudio } from "./studio-server.mjs";
+import { parseArgs } from "node:util";
+import { dev } from "astro";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const nextBin = path.join(root, "node_modules", ".bin", "next");
-const extra = process.argv.slice(2);
-const hasPortFlag = extra.some(
-  (arg) => arg === "-p" || arg === "--port" || arg.startsWith("--port="),
-);
-const nextArgs = hasPortFlag
-  ? ["dev", ...extra]
-  : ["dev", "-p", String(SITE_PORT), ...extra];
-
+const { values } = parseArgs({ options: {
+  port: { type: "string", short: "p" },
+  host: { type: "string" },
+} });
+if (values.port) process.env.SITE_PORT = values.port;
+const { SITE_ORIGIN, SITE_PORT, STUDIO_ORIGIN, STUDIO_PORT } = await import("./ports.mjs");
+const { startStudio } = await import("./studio-server.mjs");
+const root = path.resolve(import.meta.dirname, "..");
 let studio;
+let website;
+let stopping = false;
+
+async function shutdown() {
+  if (stopping) return;
+  stopping = true;
+  await website?.stop();
+  studio?.close();
+}
+
 try {
-  studio = await startStudio({ port: STUDIO_PORT, root });
-  console.log(`内容工坊  ${studio.url}`);
-} catch (error) {
-  if (error && error.code === "EADDRINUSE") {
+  try {
+    studio = await startStudio({ port: STUDIO_PORT, root });
+    console.log(`内容工坊  ${studio.url}`);
+  } catch (error) {
+    if (error?.code !== "EADDRINUSE") throw error;
     console.log(`内容工坊已在 ${STUDIO_ORIGIN}`);
-  } else {
-    console.error(error);
-    process.exit(1);
   }
+  // Supervise both servers in this process. Astro 7's agent-aware CLI can detach
+  // automatically, which would otherwise close the studio when the child exits.
+  process.env.STUDIO_ORIGIN = STUDIO_ORIGIN;
+  website = await dev({ root, server: {
+    port: SITE_PORT,
+    host: values.host || process.env.SITE_BIND_HOST || "127.0.0.1",
+  } });
+  console.log(`站点      ${SITE_ORIGIN}`);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+} catch (error) {
+  console.error(error);
+  await shutdown();
+  process.exitCode = 1;
 }
-
-const child = spawn(nextBin, nextArgs, {
-  stdio: "inherit",
-  cwd: root,
-  env: {
-    ...process.env,
-    PORT: String(SITE_PORT),
-    SITE_PORT: String(SITE_PORT),
-    STUDIO_PORT: String(STUDIO_PORT),
-    STUDIO_ORIGIN,
-    SITE_ORIGIN,
-  },
-});
-
-console.log(`站点      ${SITE_ORIGIN}`);
-
-function shutdown() {
-  studio?.close();
-  child.kill("SIGTERM");
-}
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
-child.on("exit", (code) => {
-  studio?.close();
-  process.exit(code ?? 0);
-});

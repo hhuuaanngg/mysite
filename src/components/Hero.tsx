@@ -1,5 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { DoodleArrow, DoodleStar } from "@/components/Doodles";
 import { site } from "@/content/site";
 
@@ -32,18 +31,18 @@ export function Hero() {
             className="fade-up mt-9 flex flex-wrap gap-3"
             style={{ animationDelay: "140ms" }}
           >
-            <Link
+            <a
               href="/#work"
               className="inline-flex h-12 items-center rounded-full bg-foreground px-6 text-sm font-bold text-accent-fg transition-transform hover:-translate-y-0.5"
             >
               看作品
-            </Link>
-            <Link
+            </a>
+            <a
               href="/#articles"
               className="inline-flex h-12 items-center rounded-full border border-border bg-card px-6 text-sm font-bold text-foreground paper-shadow transition-transform hover:-translate-y-0.5"
             >
               看文章
-            </Link>
+            </a>
           </div>
         </div>
 

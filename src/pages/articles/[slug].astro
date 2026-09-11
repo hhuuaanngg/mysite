@@ -1,0 +1,15 @@
+---
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import { ArticlePage } from "@/components/ArticlePage";
+import { getArticleDocument, getArticles } from "@/lib/articles";
+
+export function getStaticPaths() {
+  return getArticles().map(({ slug }) => ({
+    params: { slug }, props: { article: getArticleDocument(slug)! },
+  }));
+}
+const { article } = Astro.props;
+---
+<SiteLayout title={article.title} description={article.summary} image={article.cover} type="article">
+  <ArticlePage article={article} articles={getArticles()} />
+</SiteLayout>

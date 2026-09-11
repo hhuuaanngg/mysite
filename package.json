@@ -4,34 +4,46 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "dev:next": "next dev",
     "studio": "node scripts/studio-server.mjs",
     "build": "node scripts/build.mjs",
-    "start": "next start",
+    "start": "node scripts/preview.mjs",
     "lint": "eslint",
     "new:article": "node scripts/new-article.mjs",
-    "test": "node --test scripts/article-store.test.mjs scripts/new-article.test.mjs scripts/studio/format.test.mjs scripts/ports.test.mjs scripts/work-store.test.mjs scripts/studio-server.test.mjs scripts/markdown-toc.test.mjs scripts/publishing.test.mjs"
+    "test": "node --test scripts/article-store.test.mjs scripts/new-article.test.mjs scripts/studio/format.test.mjs scripts/ports.test.mjs scripts/work-store.test.mjs scripts/studio-server.test.mjs scripts/markdown-toc.test.mjs scripts/publishing.test.mjs",
+    "dev:astro": "astro dev",
+    "check": "astro check",
+    "test:e2e": "playwright test",
+    "test:publishing": "node --test scripts/astro-publishing.test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
     "marked": "^18.0.12",
-    "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
-    "server-only": "^0.0.1",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "astro": "7.3.2",
+    "@astrojs/react": "6.0.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@astrojs/check": "^0.9.0",
+    "@eslint/js": "^9",
+    "typescript-eslint": "^8",
+    "eslint-plugin-astro": "^1",
+    "globals": "^16",
+    "@playwright/test": "^1.58.0",
+    "@tailwindcss/vite": "^4.3.3"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

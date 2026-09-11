@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ProjectCover } from "@/components/ProjectCover";
 import type { Project } from "@/lib/project-types";
 
@@ -10,7 +9,7 @@ export function WorkCard({
   featured?: boolean;
 }) {
   return (
-    <Link
+    <a
       href={`/work/${project.slug}`}
       className="group relative block overflow-hidden rounded-3xl border border-border bg-card paper-shadow transition-transform duration-200 hover:-translate-y-1"
     >
@@ -38,6 +37,6 @@ export function WorkCard({
           ))}
         </ul>
       </div>
-    </Link>
+    </a>
   );
 }

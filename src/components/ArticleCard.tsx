@@ -1,5 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
+import { SiteImage as Image } from "@/components/SiteImage";
 import type { Article } from "@/lib/article-types";
 
 function formatDate(value: string) {
@@ -8,7 +7,7 @@ function formatDate(value: string) {
 
 export function ArticleCard({ article }: { article: Article }) {
   return (
-    <Link
+    <a
       href={`/articles/${article.slug}`}
       className="group flex h-full min-h-[9.5rem] flex-row overflow-hidden rounded-3xl border border-border bg-card paper-shadow transition-transform duration-200 hover:-translate-y-1"
     >
@@ -44,6 +43,6 @@ export function ArticleCard({ article }: { article: Article }) {
         </p>
         <span className="text-sm font-bold text-accent">阅读全文</span>
       </div>
-    </Link>
+    </a>
   );
 }

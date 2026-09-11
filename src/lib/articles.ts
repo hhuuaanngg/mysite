@@ -1,14 +1,11 @@
-import fs from "node:fs";
-import path from "node:path";
 import matter from "gray-matter";
-import "server-only";
 import type { Article, ArticleDocument } from "@/lib/article-types";
 
 export type { Article, ArticleDocument };
 
 export { markdownStartsWithImage } from "@/lib/markdown-images";
 
-const ARTICLES_DIR = path.join(process.cwd(), "src/content/articles");
+const sources = import.meta.glob("../content/articles/*.md", { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
 
 function optionalString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -39,15 +36,11 @@ function asDate(value: unknown, file: string): string {
 }
 
 function loadAll(): ArticleDocument[] {
-  if (!fs.existsSync(ARTICLES_DIR)) return [];
-
-  const files = fs
-    .readdirSync(ARTICLES_DIR)
-    .filter((name) => name.endsWith(".md"));
+  const files = Object.keys(sources);
 
   const documents = files.map((file) => {
-    const slug = file.slice(0, -".md".length);
-    const raw = fs.readFileSync(path.join(ARTICLES_DIR, file), "utf8");
+    const slug = file.split("/").pop()!.slice(0, -".md".length);
+    const raw = sources[file];
     const { data, content } = matter(raw);
 
     return {
@@ -69,14 +62,7 @@ function loadAll(): ArticleDocument[] {
 }
 
 function getDocuments(): ArticleDocument[] {
-  if (process.env.NODE_ENV === "development") {
-    return loadAll();
-  }
-  return (globalThis.__mysiteArticles ??= loadAll());
-}
-
-declare global {
-  var __mysiteArticles: ArticleDocument[] | undefined;
+  return loadAll();
 }
 
 export function getArticles(): Article[] {

@@ -1,9 +1,18 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Astro website
 
-# This is NOT the Next.js you know
+This project uses Astro 7, React 19 islands and Tailwind CSS 4. Check the installed
+Astro version and relevant official documentation before changing framework APIs.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+- Keep the existing Notion-style layout, fonts and original content assets.
+- Keep both Showcase tab panels mounted. Each list owns its page state; switching
+  between works and articles must preserve both page numbers and displayed items.
+- Static JSX components render at build time. Only SiteHeader, Showcase and Contact
+  need client hydration. Content parsing and Markdown bodies stay build-only.
+- Markdown source files remain under `src/content/articles` and `src/content/works`.
+- Use `npm run dev` for the website and local studio together (5680/5681), or Docker
+  for 5780/5781. The wrappers supervise Astro directly so agent CLI auto-background
+  behavior does not terminate the studio or orphan the browser test server.
+- Build through `npm run build` or the studio publisher to preserve selected-draft
+  isolation. Exported files stay in `out/`; the local studio is not part of that site.
+- Run `npm run check`, `npm run lint`, `npm test`, `npm run test:publishing`, and
+  `npm run build`; use `npm run test:e2e` for browser interaction changes.

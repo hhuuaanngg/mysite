@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+import { SiteImage as Image } from "@/components/SiteImage";
 
-export const metadata: Metadata = {
-  title: "页面不存在",
-  robots: { index: false, follow: false },
-};
-
-export default function NotFound() {
+export function NotFound() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-5 py-16 text-center sm:px-8 sm:py-24">
       <Image
@@ -24,12 +17,12 @@ export default function NotFound() {
       <p className="mt-3 max-w-[65ch] text-base leading-7 text-muted">
         地址不对，或者项目已经撤下。回首页看作品和文章。
       </p>
-      <Link
+      <a
         href="/"
         className="mt-8 inline-flex h-12 w-fit items-center rounded-full bg-foreground px-6 text-sm font-bold text-accent-fg hover:-translate-y-0.5"
       >
         回首页
-      </Link>
+      </a>
     </main>
   );
 }

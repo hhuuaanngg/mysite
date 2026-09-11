@@ -1,4 +1,4 @@
-// Isolated Linux integration: real sshd, rsync, Next export and nginx. No cloud credentials.
+// Isolated Linux integration: real sshd, rsync, Astro export and nginx. No cloud credentials.
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -14,7 +14,7 @@ const root = fs.mkdtempSync(path.join(os.tmpdir(), "mysite-ssh-"));
 fs.chmodSync(root, 0o755);
 const children = [];
 try {
-  for (const name of ["src", "scripts", "public", "package.json", "package-lock.json", "next.config.ts", "tsconfig.json", "postcss.config.mjs", "next-env.d.ts"]) copyTree(path.join("/app", name), path.join(root, name));
+  for (const name of ["src", "scripts", "public", "package.json", "package-lock.json", "astro.config.mjs", "tsconfig.json"]) copyTree(path.join("/app", name), path.join(root, name));
   fs.symlinkSync("/app/node_modules", path.join(root, "node_modules"), "dir");
   const publisher = createPublisher(root);
   const remotePath = path.join(root, "remote-site");
@@ -46,7 +46,7 @@ try {
   assert.equal((await fetch("http://127.0.0.1:8090/articles/ssh-secret/")).status, 404);
   assert.equal((await fetch("http://127.0.0.1:8090/articles/ssh-secret.jpg")).status, 404);
   assert.equal((await fetch("http://127.0.0.1:8090/api/publishing")).status, 404);
-  console.log("PASS full Next export, real rsync upload, nginx article, draft route and image isolation");
+  console.log("PASS full Astro export, real rsync upload, nginx article, draft route and image isolation");
   save("ssh-ready", "VISIBLE_SECOND_VERSION");
   const second = await (await publisher.start({ mode: "deploy", selection: pendingChanges(root).filter((c) => c.key.endsWith("ssh-ready.md")) })).completion;
   assert.equal(second.status, "published", second.error);

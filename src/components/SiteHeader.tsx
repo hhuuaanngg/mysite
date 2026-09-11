@@ -1,6 +1,3 @@
-"use client";
-
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { NotionFace } from "@/components/Doodles";
 import { nav, site } from "@/content/site";
@@ -43,26 +40,26 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
       className="site-header sticky top-0 z-50 border-b"
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:h-16 sm:px-8">
-        <Link
+        <a
           href="/"
           className="inline-flex items-center gap-2 text-sm font-extrabold tracking-tight text-foreground"
         >
           <NotionFace className="h-7 w-7" />
           {site.shortName}
-        </Link>
+        </a>
 
         <nav
           className="hidden items-center gap-1 text-sm font-semibold text-muted md:flex"
           aria-label="主导航"
         >
           {nav.map((item) => (
-            <Link
+            <a
               key={item.href}
               href={item.href}
               className="rounded-full px-3 py-1.5 transition-colors hover:bg-card hover:text-foreground"
             >
               {item.label}
-            </Link>
+            </a>
           ))}
           {studioHref ? (
             <a
@@ -96,13 +93,13 @@ export function SiteHeader({ studioHref }: { studioHref?: string }) {
           <ul className="flex flex-col gap-1">
             {nav.map((item) => (
               <li key={item.href}>
-                <Link
+                <a
                   href={item.href}
                   className="block rounded-xl px-2 py-2 text-sm font-semibold text-muted hover:bg-card hover:text-foreground"
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
-                </Link>
+                </a>
               </li>
             ))}
             {studioHref ? (

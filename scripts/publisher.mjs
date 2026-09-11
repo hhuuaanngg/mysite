@@ -7,7 +7,7 @@ import {
 } from "./publish-store.mjs";
 import { run, validateSettings, targetKey, checkConnection, deploy, rollback, remoteCurrent, verifyRemote } from "./ssh-deploy.mjs";
 
-const APP_FILES = ["src", "scripts", "package.json", "package-lock.json", "next.config.ts", "tsconfig.json", "postcss.config.mjs", "eslint.config.mjs", "next-env.d.ts"];
+const APP_FILES = ["src", "scripts", "package.json", "package-lock.json", "astro.config.mjs", "tsconfig.json", "eslint.config.mjs"];
 
 export async function buildRelease(root, source, output, { siteUrl, onOutput } = {}) {
   const work = path.join(path.dirname(source), "build");
@@ -19,9 +19,9 @@ export async function buildRelease(root, source, output, { siteUrl, onOutput } =
       copyTree(path.join(source, name), path.join(work, name));
     }
     fs.symlinkSync(path.join(root, "node_modules"), path.join(work, "node_modules"), "dir");
-    await run(process.execPath, [path.join(root, "node_modules/next/dist/bin/next"), "build", "--webpack"], {
+    await run(process.execPath, [path.join(root, "node_modules/.bin/astro"), "build"], {
       cwd: work, onOutput,
-      env: { ...process.env, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1", ...(siteUrl ? { SITE_URL: siteUrl } : {}) },
+      env: { ...process.env, NODE_ENV: "production", ASTRO_TELEMETRY_DISABLED: "1", ...(siteUrl ? { SITE_URL: siteUrl } : {}) },
     });
     if (!fs.existsSync(path.join(work, "out/index.html"))) throw new Error("没有生成完整网站");
     fs.renameSync(path.join(work, "out"), output);

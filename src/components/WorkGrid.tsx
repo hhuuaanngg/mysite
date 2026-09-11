@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Pagination } from "@/components/Pagination";
 import { WorkCard } from "@/components/WorkCard";

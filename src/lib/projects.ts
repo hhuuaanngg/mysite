@@ -1,13 +1,10 @@
-import fs from "node:fs";
-import path from "node:path";
 import matter from "gray-matter";
-import "server-only";
 import { firstMarkdownImageSrc } from "@/lib/markdown-images";
 import type { Project, ProjectCover, ProjectDocument } from "@/lib/project-types";
 
 export type { Project, ProjectCover, ProjectDocument };
 
-const WORKS_DIR = path.join(process.cwd(), "src/content/works");
+const sources = import.meta.glob("../content/works/*.md", { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
 const COLOR = /^#[0-9a-fA-F]{6}$/;
 
 function asString(value: unknown, field: string, file: string): string {
@@ -71,14 +68,12 @@ function toProject(doc: ProjectDocument): Project {
 }
 
 function loadAll(): ProjectDocument[] {
-  if (!fs.existsSync(WORKS_DIR)) return [];
-
-  const files = fs.readdirSync(WORKS_DIR).filter((name) => name.endsWith(".md"));
+  const files = Object.keys(sources);
 
   const projects = files.map((file) => {
-    const parsed = matter(fs.readFileSync(path.join(WORKS_DIR, file), "utf8"));
+    const parsed = matter(sources[file]);
     const data = parsed.data as Record<string, unknown>;
-    const slug = asString(data.slug ?? file.slice(0, -".md".length), "slug", file);
+    const slug = asString(data.slug ?? file.split("/").pop()!.slice(0, -".md".length), "slug", file);
     const repo = asOptionalString(data.repo);
     const url = asOptionalString(data.url);
     const content = parsed.content.trim();
@@ -111,14 +106,7 @@ function loadAll(): ProjectDocument[] {
 }
 
 function getAll(): ProjectDocument[] {
-  if (process.env.NODE_ENV === "development") {
-    return loadAll();
-  }
-  return (globalThis.__mysiteProjects ??= loadAll());
-}
-
-declare global {
-  var __mysiteProjects: ProjectDocument[] | undefined;
+  return loadAll();
 }
 
 export function getProjects(): Project[] {

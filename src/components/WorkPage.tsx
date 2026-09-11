@@ -1,57 +1,18 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArticleBody } from "@/components/ArticleBody";
 import { ProjectCover } from "@/components/ProjectCover";
 import { TableOfContents } from "@/components/TableOfContents";
 import { extractMarkdownToc } from "@/lib/markdown-toc";
-import { getProject, getProjects } from "@/lib/projects";
+import type { ProjectDocument } from "@/lib/project-types";
 
-type WorkPageProps = {
-  params: Promise<{ slug: string }>;
-};
-
-export function generateStaticParams() {
-  return getProjects().map((project) => ({ slug: project.slug }));
-}
-
-export async function generateMetadata({
-  params,
-}: WorkPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const project = getProject(slug);
-
-  if (!project) {
-    return { title: "未找到项目" };
-  }
-
-  return {
-    title: project.title,
-    description: project.summary,
-    openGraph: {
-      title: project.title,
-      description: project.summary,
-      type: "article",
-    },
-  };
-}
-
-export default async function WorkPage({ params }: WorkPageProps) {
-  const { slug } = await params;
-  const project = getProject(slug);
-
-  if (!project) {
-    notFound();
-  }
-
+export function WorkPage({ project }: { project: ProjectDocument }) {
   const toc = extractMarkdownToc(project.content);
 
   return (
     <article className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <p className="text-sm font-bold text-subtle">
-        <Link href="/#work" className="hover:text-foreground">
+        <a href="/#work" className="hover:text-foreground">
           ← 作品
-        </Link>
+        </a>
       </p>
 
       <header className="mt-8 max-w-3xl">

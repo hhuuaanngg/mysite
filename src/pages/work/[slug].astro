@@ -1,0 +1,15 @@
+---
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import { WorkPage } from "@/components/WorkPage";
+import { getProject, getProjects } from "@/lib/projects";
+
+export function getStaticPaths() {
+  return getProjects().map(({ slug }) => ({
+    params: { slug }, props: { project: getProject(slug)! },
+  }));
+}
+const { project } = Astro.props;
+---
+<SiteLayout title={project.title} description={project.summary} type="article">
+  <WorkPage project={project} />
+</SiteLayout>

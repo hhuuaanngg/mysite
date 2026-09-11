@@ -12,7 +12,8 @@ services:
       SITE_PORT: "5780"
       STUDIO_PORT: "5781"
       STUDIO_BIND_HOST: "0.0.0.0"
-      WATCHPACK_POLLING: "true"
+      SITE_BIND_HOST: "0.0.0.0"
+      CHOKIDAR_USEPOLLING: "true"
     volumes:
       - ./src/content/articles:/app/src/content/articles
       - ./src/content/works:/app/src/content/works

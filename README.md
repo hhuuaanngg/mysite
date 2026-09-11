@@ -2,6 +2,8 @@
 
 Joey Huang 的个人站点。浅色 Notion 卡通风，格子纸背景。
 
+使用 **Astro 7.3.2 + React 19 + Tailwind CSS 4**。Astro 生成静态页面；导航、作品/文章切换与联系方式作为 React 交互组件加载。作品和文章列表切换时持续挂载，各自保留分页状态。
+
 页面结构：作品、文章、关于、联系。项目详情在 `/work/[slug]`，文章详情在 `/articles/[slug]`。
 
 ## 推荐使用：本地 Docker 写作和发布
@@ -26,6 +28,8 @@ docker compose up -d --build --wait
 
 ## 本地运行
 
+需要 Node.js 22.12 或更高版本。
+
 ```bash
 npm install
 npm run dev
@@ -42,6 +46,24 @@ npm run dev
 ```bash
 npm run build
 ```
+
+`npm start` 预览生成的静态网站，默认端口 5680；已有开发服务时可以使用 `npm start -- --port 5692`。正式部署继续使用内容工坊的发布流程。
+
+## 验证
+
+```bash
+npm run check
+npm run lint
+npm test
+npm run test:publishing
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+`test:publishing` 使用临时内容执行真正的 Astro 构建，检查已发布正文、选中草稿和未选中草稿的隔离。浏览器测试使用 5690 端口，覆盖桌面和手机的独立分页保留、锚点导航、详情目录、图片、元数据和 404。
+
+迁移说明与验收记录：[Astro 7 迁移验收](docs/astro7-migration-acceptance.md)。
 
 ## 新增 / 编辑文章
 

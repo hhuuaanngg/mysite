@@ -1,40 +1,14 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { ArticleBody } from "@/components/ArticleBody";
 import { TableOfContents } from "@/components/TableOfContents";
 import type { Article } from "@/lib/article-types";
-import { getArticleDocument, getArticles, markdownStartsWithImage } from "@/lib/articles";
+import { markdownStartsWithImage } from "@/lib/markdown-images";
+import type { ArticleDocument } from "@/lib/article-types";
 import { extractMarkdownToc } from "@/lib/markdown-toc";
-import { site } from "@/content/site";
 
-type Props = { params: Promise<{ slug: string }> };
 
 function formatDate(value: string) {
   return value.replaceAll("-", ".");
-}
-
-export function generateStaticParams() {
-  return getArticles().map((article) => ({ slug: article.slug }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const article = getArticleDocument(slug);
-  if (!article) return { title: "未找到文章" };
-
-  return {
-    title: article.title,
-    description: article.summary,
-    openGraph: {
-      title: article.title,
-      description: article.summary,
-      type: "article",
-      url: `${site.url}/articles/${article.slug}/`,
-      ...(article.cover ? { images: [{ url: article.cover }] } : {}),
-    },
-  };
 }
 
 function ArticlePager({
@@ -47,22 +21,22 @@ function ArticlePager({
   return (
     <nav className="mt-16 flex flex-wrap items-start justify-between gap-4 border-t border-border pt-8 text-sm font-bold">
       {newer ? (
-        <Link
+        <a
           href={`/articles/${newer.slug}`}
           className="max-w-[46%] text-accent hover:underline"
         >
           ← {newer.title}
-        </Link>
+        </a>
       ) : (
         <span />
       )}
       {older ? (
-        <Link
+        <a
           href={`/articles/${older.slug}`}
           className="max-w-[46%] text-right text-accent hover:underline"
         >
           {older.title} →
-        </Link>
+        </a>
       ) : (
         <span />
       )}
@@ -70,12 +44,7 @@ function ArticlePager({
   );
 }
 
-export default async function ArticlePage({ params }: Props) {
-  const { slug } = await params;
-  const article = getArticleDocument(slug);
-  if (!article) notFound();
-
-  const articles = getArticles();
+export function ArticlePage({ article, articles }: { article: ArticleDocument; articles: Article[] }) {
   const index = articles.findIndex((item) => item.slug === article.slug);
   const newer = index > 0 ? articles[index - 1] : undefined;
   const older =
@@ -85,9 +54,9 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <article className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <p className="text-sm font-bold text-subtle">
-        <Link href="/#articles" className="hover:text-foreground">
+        <a href="/#articles" className="hover:text-foreground">
           ← 文章
-        </Link>
+        </a>
       </p>
 
       <header className="mt-8">

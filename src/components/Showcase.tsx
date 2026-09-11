@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { ArticleList } from "@/components/ArticleList";
 import { WorkGrid } from "@/components/WorkGrid";

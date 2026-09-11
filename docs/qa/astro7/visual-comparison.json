@@ -1,0 +1,25 @@
+{
+  "browser": "Chrome",
+  "reducedMotion": "reduce",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 1000
+    }
+  ],
+  "method": "Full-page PNG comparison, pixelmatch threshold 0.15, same browser/font files/viewport",
+  "sameImageDimensions": true,
+  "differentPixelsPercent": {
+    "home": 0.024,
+    "articles": 0.031,
+    "work-frpc-editor": 0.0,
+    "article-manufacturing": 0.0,
+    "mobile-home": 0.071,
+    "mobile-articles": 0.087
+  },
+  "note": "Homepage includes the factual about-text change from Next.js to Astro. Not a cross-browser visual equivalence guarantee."
+}

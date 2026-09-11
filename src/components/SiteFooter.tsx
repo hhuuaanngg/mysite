@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { NotionFace } from "@/components/Doodles";
 import { site } from "@/content/site";
 
@@ -11,18 +10,18 @@ export function SiteFooter() {
           © {new Date().getFullYear()} {site.name}
         </p>
         <div className="flex flex-wrap gap-5">
-          <Link href="/#work" className="hover:text-foreground">
+          <a href="/#work" className="hover:text-foreground">
             作品
-          </Link>
-          <Link href="/#articles" className="hover:text-foreground">
+          </a>
+          <a href="/#articles" className="hover:text-foreground">
             文章
-          </Link>
-          <Link href="/#about" className="hover:text-foreground">
+          </a>
+          <a href="/#about" className="hover:text-foreground">
             关于
-          </Link>
-          <Link href="/#contact" className="hover:text-foreground">
+          </a>
+          <a href="/#contact" className="hover:text-foreground">
             联系
-          </Link>
+          </a>
         </div>
       </div>
     </footer>

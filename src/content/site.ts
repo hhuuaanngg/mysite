@@ -5,7 +5,7 @@ export const site = {
   tagline: "做桌面工具、个人站点与全栈小产品。",
   description:
     "Joey Huang 的个人站点。作品、文章、关于与社交媒体。",
-  url: process.env.SITE_URL || "https://hjy.me",
+  url: import.meta.env.PUBLIC_SITE_URL || "https://hjy.me",
   locale: "zh-CN",
   email: "hhuuaanngg2020@gmail.com",
   github: {
@@ -14,7 +14,7 @@ export const site = {
   },
   about: [
     "我更愿意把时间花在能反复用的工具上：配置要看得见、状态要说得清、部署要自己跑得通。",
-    "技术栈以 TypeScript 为主，桌面端用 Tauri，站点用 Next.js。作品和文章都写在这个站上。",
+    "技术栈以 TypeScript 为主，桌面端用 Tauri，站点用 Astro。作品和文章都写在这个站上。",
   ],
 } as const;
 

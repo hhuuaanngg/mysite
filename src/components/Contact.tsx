@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { CopyEmail } from "@/components/CopyEmail";
 import { SectionHeading } from "@/components/SectionHeading";

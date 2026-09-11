@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import { SectionHeading } from "@/components/SectionHeading";
 import { site } from "@/content/site";
 

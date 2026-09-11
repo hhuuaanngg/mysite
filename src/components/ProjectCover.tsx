@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SiteImage as Image } from "@/components/SiteImage";
 import type { Project } from "@/lib/project-types";
 
 export function ProjectCover({
