@@ -11,7 +11,7 @@ export function ArticlePager({
     <nav className="mt-16 flex flex-wrap items-start justify-between gap-4 border-t border-border pt-8 text-sm font-bold">
       {newer ? (
         <a
-          href={`/articles/${newer.slug}`}
+          href={`/articles/${newer.slug}/`}
           className="max-w-[46%] text-accent hover:underline"
         >
           ← {newer.title}
@@ -21,7 +21,7 @@ export function ArticlePager({
       )}
       {older ? (
         <a
-          href={`/articles/${older.slug}`}
+          href={`/articles/${older.slug}/`}
           className="max-w-[46%] text-right text-accent hover:underline"
         >
           {older.title} →

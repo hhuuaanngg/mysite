@@ -115,3 +115,35 @@ test("原生 Markdown 的表格、图片说明和手机正文布局保持可用"
   await expect(page.locator(".markdown-body figure img").first()).toHaveAttribute("width", "1200");
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
 });
+
+test("首页卡片与文章翻篇使用带末尾斜杠的详情地址", async ({ page }) => {
+  await page.goto("/#articles");
+  await page.locator('astro-island[component-export="Showcase"]:not([ssr])').waitFor();
+  const articleLinks = page.getByRole("tabpanel", { name: "文章", exact: true }).getByRole("link");
+  for (const href of await articleLinks.evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
+    expect(href).toMatch(/^\/articles\/[^/]+\/$/);
+  }
+  await page.locator('a[href^="/articles/goldencoast"]').click();
+  await expect(page).toHaveURL(/\/articles\/goldencoast\/$/);
+  await expect(page.locator("article h1")).toBeVisible();
+  const pagerLinks = page.locator('article nav a[href^="/articles/"]');
+  expect(await pagerLinks.count()).toBeGreaterThan(0);
+  for (const href of await pagerLinks.evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
+    expect(href).toMatch(/^\/articles\/[^/]+\/$/);
+  }
+  const nextUrl = new URL((await pagerLinks.first().getAttribute("href"))!, page.url()).href;
+  await pagerLinks.first().click();
+  await expect(page).toHaveURL(nextUrl);
+  await expect(page.locator("article h1").first()).toBeVisible();
+
+  await page.goto("/#work");
+  await page.locator('astro-island[component-export="Showcase"]:not([ssr])').waitFor();
+  const workLinks = page.getByRole("tabpanel", { name: "作品", exact: true }).getByRole("link");
+  for (const href of await workLinks.evaluateAll((links) => links.map((link) => link.getAttribute("href")))) {
+    expect(href).toMatch(/^\/work\/[^/]+\/$/);
+  }
+  const workUrl = new URL((await workLinks.first().getAttribute("href"))!, page.url()).href;
+  await workLinks.first().click();
+  await expect(page).toHaveURL(workUrl);
+  await expect(page.locator("article h1").first()).toBeVisible();
+});

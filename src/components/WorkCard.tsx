@@ -10,7 +10,7 @@ export function WorkCard({
 }) {
   return (
     <a
-      href={`/work/${project.slug}`}
+      href={`/work/${project.slug}/`}
       className="group relative block overflow-hidden rounded-3xl border border-border bg-card paper-shadow transition-transform duration-200 hover:-translate-y-1"
     >
       <ProjectCover project={project} size={featured ? "hero" : "default"} />

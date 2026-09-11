@@ -8,7 +8,7 @@ function formatDate(value: string) {
 export function ArticleCard({ article }: { article: Article }) {
   return (
     <a
-      href={`/articles/${article.slug}`}
+      href={`/articles/${article.slug}/`}
       className="group flex h-full min-h-[9.5rem] flex-row overflow-hidden rounded-3xl border border-border bg-card paper-shadow transition-transform duration-200 hover:-translate-y-1"
     >
       <div className="relative w-[7.25rem] min-h-[9.5rem] shrink-0 self-stretch sm:w-36 md:w-40">

@@ -4,6 +4,8 @@ This project uses Astro 7, React 19 islands and Tailwind CSS 4. Check the instal
 Astro version and relevant official documentation before changing framework APIs.
 
 - Keep the existing Notion-style layout, fonts and original content assets.
+- Detail links must end in `/` to match `trailingSlash: "always"`; verify card
+  clicks and article previous/next links in the dev server, not just direct URLs.
 - Keep both Showcase tab panels mounted. Each list owns its page state; switching
   between works and articles must preserve both page numbers and displayed items.
 - Static JSX and Astro components render at build time. Only SiteHeader, Showcase and Contact
