@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArticleBody } from "@/components/ArticleBody";
 import { ProjectCover } from "@/components/ProjectCover";
-import { getProject, projects } from "@/content/projects";
+import { TableOfContents } from "@/components/TableOfContents";
+import { extractMarkdownToc } from "@/lib/markdown-toc";
+import { getProject, getProjects } from "@/lib/projects";
 
 type WorkPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+  return getProjects().map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({
@@ -41,6 +44,8 @@ export default async function WorkPage({ params }: WorkPageProps) {
     notFound();
   }
 
+  const toc = extractMarkdownToc(project.content);
+
   return (
     <article className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <p className="text-sm font-bold text-subtle">
@@ -66,73 +71,56 @@ export default async function WorkPage({ params }: WorkPageProps) {
       </div>
 
       <div className="mt-12 grid gap-12 md:grid-cols-[minmax(0,1fr)_16rem]">
-        <div className="max-w-[65ch] space-y-10">
-          <section>
-            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
-              问题
+        <ArticleBody
+          content={project.content}
+          className="space-y-6"
+          heading="pill"
+          empty="这个项目介绍还在整理中。"
+        />
+
+        <aside className="space-y-6">
+          <div className="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
+            <h2 className="text-xs font-extrabold tracking-wide text-subtle uppercase">
+              链接与栈
             </h2>
-            <p className="mt-3 text-base leading-7 text-muted">{project.problem}</p>
-          </section>
-          <section>
-            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
-              方案
-            </h2>
-            <p className="mt-3 text-base leading-7 text-muted">
-              {project.solution}
-            </p>
-          </section>
-          <section>
-            <h2 className="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
-              技术要点
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-muted">
-              {project.highlights.map((item) => (
-                <li key={item}>{item}</li>
+            <ul className="mt-4 space-y-3 text-sm font-bold">
+              {project.repo ? (
+                <li>
+                  <a
+                    href={project.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    GitHub ↗
+                  </a>
+                </li>
+              ) : null}
+              {project.url ? (
+                <li>
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    线上 ↗
+                  </a>
+                </li>
+              ) : null}
+            </ul>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {project.stack.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-[11px] text-subtle"
+                >
+                  {tag}
+                </li>
               ))}
             </ul>
-          </section>
-        </div>
-
-        <aside className="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
-          <h2 className="text-xs font-extrabold tracking-wide text-subtle uppercase">
-            链接与栈
-          </h2>
-          <ul className="mt-4 space-y-3 text-sm font-bold">
-            {project.repo ? (
-              <li>
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  GitHub ↗
-                </a>
-              </li>
-            ) : null}
-            {project.url ? (
-              <li>
-                <a
-                  href={project.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  线上 ↗
-                </a>
-              </li>
-            ) : null}
-          </ul>
-          <ul className="mt-6 flex flex-wrap gap-2">
-            {project.stack.map((tag) => (
-              <li
-                key={tag}
-                className="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-[11px] text-subtle"
-              >
-                {tag}
-              </li>
-            ))}
-          </ul>
+          </div>
+          <TableOfContents items={toc} />
         </aside>
       </div>
     </article>

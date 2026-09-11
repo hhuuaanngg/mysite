@@ -3,26 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>文章工坊</title>
+    <title>内容工坊</title>
     <link rel="stylesheet" href="/studio.css" />
   </head>
-  <body>
+  <body data-mode="articles">
     <header class="top">
       <div class="brand">
         <span class="face" aria-hidden="true"></span>
         <div>
           <p class="kicker">本机 · 不会上线</p>
-          <h1>文章工坊</h1>
+          <h1 id="studio-title">内容工坊</h1>
         </div>
       </div>
-      <a class="ghost" data-open-site href="http://127.0.0.1:3100/" target="_blank" rel="noreferrer">打开站点</a>
+      <div class="top-actions">
+        <nav class="modes" role="tablist" aria-label="内容类型">
+          <button type="button" role="tab" data-mode="articles" class="active">文章</button>
+          <button type="button" role="tab" data-mode="works">作品</button>
+        </nav>
+        <a class="ghost" data-open-site href="http://127.0.0.1:5680/" target="_blank" rel="noreferrer">打开站点</a>
+      </div>
     </header>
 
     <main class="layout">
       <aside class="side">
-        <button type="button" class="new" id="new-btn">+ 新建文章</button>
-        <p class="hint">点保存就会写入仓库里的 Markdown、封面和相册。</p>
-        <ul id="article-list" class="list"></ul>
+        <div id="article-side">
+          <button type="button" class="new" id="new-btn">+ 新建文章</button>
+          <p class="hint">点保存就会写入仓库里的 Markdown、封面和相册。</p>
+          <ul id="article-list" class="list"></ul>
+        </div>
+        <div id="work-side" hidden>
+          <button type="button" class="new" id="new-work-btn">+ 新建作品</button>
+          <p class="hint">点保存就会写入 <code>src/content/works/&lt;slug&gt;.md</code>。</p>
+          <ul id="work-list" class="list"></ul>
+        </div>
       </aside>
 
       <section class="editor">
@@ -120,8 +133,118 @@
             保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
           </p>
         </form>
+
+        <form id="work-form" hidden>
+          <div class="row">
+            <label>
+              标题
+              <input id="work-title" required placeholder="项目名称" autocomplete="off" />
+            </label>
+            <label>
+              slug
+              <input id="work-slug" required placeholder="english-slug" autocomplete="off" />
+            </label>
+          </div>
+          <div class="row three">
+            <label>
+              年份
+              <input id="work-year" required placeholder="2026 或 早期" />
+            </label>
+            <label class="check">
+              <input id="work-featured" type="checkbox" />
+              精选（首页大卡）
+            </label>
+            <span></span>
+          </div>
+          <label>
+            摘要
+            <input id="work-summary" required placeholder="列表上的一两句" />
+          </label>
+          <label>
+            技术栈（一行一个，或逗号分隔）
+            <textarea id="work-stack" rows="4" required placeholder="TypeScript"></textarea>
+          </label>
+          <div class="row">
+            <label>
+              GitHub（可选）
+              <input id="work-repo" type="url" placeholder="https://github.com/..." />
+            </label>
+            <label>
+              线上地址（可选）
+              <input id="work-url" type="url" placeholder="https://..." />
+            </label>
+          </div>
+
+          <div class="work-cover-row">
+            <div>
+              <p class="label">封面图（可选）</p>
+              <label class="drop" id="work-cover-drop">
+                <input id="work-cover-input" type="file" accept="image/*" hidden />
+                <img id="work-cover-image" alt="" hidden />
+                <span id="work-cover-copy">拖进来，或点击选择。有图时顶部不再用色块。</span>
+              </label>
+              <button type="button" class="ghost" id="work-cover-clear" hidden>去掉封面图</button>
+              <p class="label" style="margin-top:14px">没有图时的色块</p>
+              <label>
+                字母
+                <input id="work-mark" required maxlength="8" placeholder="fr" />
+              </label>
+              <div class="palette-grid" id="work-palettes" role="listbox" aria-label="封面配色"></div>
+            </div>
+            <div>
+              <p class="label">预览</p>
+              <div id="work-cover-preview" class="work-cover" aria-hidden="true">
+                <img id="work-cover-preview-image" alt="" hidden />
+                <span id="work-cover-mark">aa</span>
+                <span id="work-cover-year">2026</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="body-block">
+            <div class="body-head">
+              <span class="label">正文（Markdown）</span>
+              <div class="toolbar" id="work-toolbar" role="toolbar" aria-label="作品正文格式">
+                <button type="button" data-cmd="bold" title="加粗 Ctrl+B">加粗</button>
+                <button type="button" data-cmd="italic" title="斜体 Ctrl+I">斜体</button>
+                <button type="button" data-cmd="h2" title="二级标题">标题</button>
+                <button type="button" data-cmd="h3" title="三级标题">小标题</button>
+                <button type="button" data-cmd="quote" title="引用">引用</button>
+                <button type="button" data-cmd="list" title="列表">列表</button>
+                <button type="button" data-cmd="image" title="在光标处插入图片">图片</button>
+              </div>
+            </div>
+            <input id="work-inline-image-input" type="file" accept="image/*" multiple hidden />
+            <p class="hint">工具栏插图会写进正文；若还没上传封面，第一张图会当作封面。</p>
+            <div class="split">
+              <div class="pane">
+                <p class="pane-label">原文</p>
+                <textarea
+                  id="work-body"
+                  rows="16"
+                  required
+                  placeholder="左边写 Markdown，右边看效果。"
+                ></textarea>
+              </div>
+              <div class="pane">
+                <p class="pane-label">预览</p>
+                <div id="work-preview" class="preview"></div>
+              </div>
+            </div>
+          </div>
+
+          <p id="work-status" class="status" role="status"></p>
+          <div class="actions">
+            <button type="submit" class="save">保存到仓库</button>
+            <button type="button" class="danger" id="work-delete-btn" hidden>删除</button>
+            <a id="work-preview-link" class="ghost" hidden target="_blank" rel="noreferrer">打开预览</a>
+          </div>
+          <p class="footnote">
+            保存后文件已在本地。要发布：提交 git，再部署。工坊只监听 127.0.0.1，不会出现在线上站点。
+          </p>
+        </form>
       </section>
     </main>
-    <script src="/studio.js" type="module"></script>
+    <script src="/app.js" type="module"></script>
   </body>
 </html>

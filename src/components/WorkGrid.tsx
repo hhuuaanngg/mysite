@@ -2,18 +2,19 @@
 
 import { Pagination } from "@/components/Pagination";
 import { WorkCard } from "@/components/WorkCard";
-import { getProjectsInDisplayOrder } from "@/content/projects";
 import { WORK_PAGE_SIZE, paginate } from "@/lib/pagination";
+import type { Project } from "@/lib/project-types";
 
 export function WorkGrid({
+  projects,
   page,
   onPageChange,
 }: {
+  projects: Project[];
   page: number;
   onPageChange: (page: number) => void;
 }) {
-  const all = getProjectsInDisplayOrder();
-  const { items, totalPages } = paginate(all, page, WORK_PAGE_SIZE);
+  const { items, totalPages } = paginate(projects, page, WORK_PAGE_SIZE);
   const featured = items[0];
   const others = items.slice(1);
 

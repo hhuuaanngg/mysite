@@ -11,9 +11,9 @@ npm install
 npm run dev
 ```
 
-打开 [http://127.0.0.1:3100](http://127.0.0.1:3100)。导航里会出现 **写文章**，进入本机文章工坊（[http://127.0.0.1:4310](http://127.0.0.1:4310)）。
+打开 [http://127.0.0.1:5680](http://127.0.0.1:5680)。导航里会出现 **写内容**，进入本机工坊（[http://127.0.0.1:5681](http://127.0.0.1:5681)）。文章和作品都在这里可视化新建、编辑。
 
-站点不用 3000，工坊不用 8787，避免和本机其它服务抢端口。改端口：`SITE_PORT=3200 STUDIO_PORT=4320 npm run dev`。
+站点不用 3000 / 3100，工坊不用 8787 / 4310，避免和本机其它服务抢端口。改端口：`SITE_PORT=5700 STUDIO_PORT=5701 npm run dev`。
 
 ## 构建
 
@@ -31,7 +31,7 @@ npm run build
 - `public/articles/<slug>.jpg`
 - `public/articles/gallery/<slug>/01.jpg` …
 
-站点预览：`http://127.0.0.1:3100/articles/<slug>/`。确认无误后提交 git，部署即发布。工坊只监听 `127.0.0.1`，不会出现在线上站点。
+站点预览：`http://127.0.0.1:5680/articles/<slug>/`。确认无误后提交 git，部署即发布。工坊只监听 `127.0.0.1`，不会出现在线上站点。
 
 也可以继续用命令：
 
@@ -53,7 +53,18 @@ npm run new:article -- --from drafts/qingdao-2026
 
 中文标题必须给英文 slug。`drafts/` 已忽略，不会进 git。
 
+## 新增 / 编辑作品
+
+本机可视化：工坊切到 **作品**（[http://127.0.0.1:5681/#works](http://127.0.0.1:5681/#works)）→ 填标题、年份、摘要、技术栈 → 用工具栏写 Markdown 正文（左原文、右预览）→ 上传封面图或选一套色块 → **保存到仓库**。会生成：
+
+- `src/content/works/<slug>.md`
+- 封面图（可选）：`public/works/<slug>.jpg`
+- 正文里的图：`public/works/gallery/<slug>/01.jpg` …
+
+站点预览：`http://127.0.0.1:5680/work/<slug>/`。确认无误后提交 git，部署即发布。
+
+中文标题必须给英文 slug。封面可以上传图片；没有图时从固定配色里选一套色块。正文也可以插图。
+
 ## 改其它内容
 
 - 姓名、社交账号：`src/content/site.ts`
-- 作品：`src/content/projects.ts`

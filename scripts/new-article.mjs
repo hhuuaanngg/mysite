@@ -310,7 +310,7 @@ export function helpText() {
 
 可视化（推荐）
   npm run dev
-  打开 ${STUDIO_ORIGIN} 或站点上的「写文章」
+  打开 ${STUDIO_ORIGIN} 或站点上的「写内容」
   点「保存到仓库」即生成 Markdown / 封面 / 相册
 
 命令行

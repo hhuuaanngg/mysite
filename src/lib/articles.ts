@@ -6,6 +6,8 @@ import type { Article, ArticleDocument } from "@/lib/article-types";
 
 export type { Article, ArticleDocument };
 
+export { markdownStartsWithImage } from "@/lib/markdown-images";
+
 const ARTICLES_DIR = path.join(process.cwd(), "src/content/articles");
 
 function optionalString(value: unknown): string {
@@ -90,8 +92,4 @@ export function getArticles(): Article[] {
 
 export function getArticleDocument(slug: string): ArticleDocument | undefined {
   return getDocuments().find((article) => article.slug === slug);
-}
-
-export function markdownStartsWithImage(content: string) {
-  return /^!\[[^\]]*\]\([^)]+\)/.test(content.trim());
 }

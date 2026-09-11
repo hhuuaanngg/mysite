@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArticleList } from "@/components/ArticleList";
 import { WorkGrid } from "@/components/WorkGrid";
 import type { Article } from "@/lib/article-types";
+import type { Project } from "@/lib/project-types";
 
 type Tab = "work" | "articles";
 
@@ -29,7 +30,13 @@ function tabFromHash(hash: string): Tab | null {
   return null;
 }
 
-export function Showcase({ articles }: { articles: Article[] }) {
+export function Showcase({
+  articles,
+  projects,
+}: {
+  articles: Article[];
+  projects: Project[];
+}) {
   const [tab, setTab] = useState<Tab>("work");
   const [workPage, setWorkPage] = useState(1);
   const [articlePage, setArticlePage] = useState(1);
@@ -147,7 +154,11 @@ export function Showcase({ articles }: { articles: Article[] }) {
           className="mt-10"
         >
           {tab === "work" ? (
-            <WorkGrid page={workPage} onPageChange={setWorkPage} />
+            <WorkGrid
+              projects={projects}
+              page={workPage}
+              onPageChange={setWorkPage}
+            />
           ) : (
             <ArticleList
               articles={articles}
