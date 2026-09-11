@@ -19,7 +19,7 @@ export function About() {
           alt=""
           width={320}
           height={320}
-          className="mx-auto w-48 bob-slow sm:w-56 lg:w-full"
+          className="mx-auto w-24 bob-slow sm:w-28 lg:w-1/2"
         />
       </div>
     </section>

@@ -17,10 +17,9 @@ const crewPieces: {
   { src: "/illustrations/hero-star.png", x: 56, y: 223, w: 69, h: 68, z: 1 },
   { src: "/illustrations/hero-notebook.png", x: 753, y: 871, w: 203, h: 107, z: 2 },
   { src: "/illustrations/hero-code.png", x: 91, y: 379, w: 330, h: 496, z: 3 },
-  { src: "/illustrations/hero-stand.png", x: 626, y: 248, w: 333, h: 636, z: 4 },
-  { src: "/illustrations/hero-dog.png", x: 419, y: 523, w: 292, h: 374, z: 5, motion: "bob" },
-  { src: "/illustrations/hero-cat.png", x: 878, y: 620, w: 196, h: 261, z: 6, motion: "bob-slow" },
-  { src: "/illustrations/hero-coffee.png", x: 1091, y: 339, w: 325, h: 590, z: 7 },
+  { src: "/illustrations/wave.png", x: 470, y: 249, w: 358, h: 635, z: 4 },
+  { src: "/illustrations/hero-cat.png", x: 878, y: 620, w: 196, h: 261, z: 5, motion: "bob-slow" },
+  { src: "/illustrations/hero-coffee.png", x: 1091, y: 339, w: 325, h: 590, z: 6 },
 ];
 
 export function Hero() {
@@ -68,19 +67,11 @@ export function Hero() {
         </div>
 
         <div className="relative mx-auto w-full max-w-xl pt-8 lg:max-w-none lg:pt-4">
-          <Image
-            src="/illustrations/wave.png"
-            alt=""
-            width={220}
-            height={220}
-            priority
-            className="pointer-events-none absolute -top-2 right-2 z-10 w-[5.5rem] bob-slow sm:w-28 lg:-top-6 lg:right-4 lg:w-32"
-          />
           <div
             className="relative w-full"
             style={{ aspectRatio: `${CREW_W} / ${CREW_H}` }}
             role="img"
-            aria-label="同一个 Notion 风格男生：写代码、挥手打招呼、坐在便签上喝咖啡，身边有金毛和金渐层猫咪"
+            aria-label="同一个 Notion 风格男生：写代码、挥手打招呼、坐在便签上喝咖啡，身边有金渐层猫咪"
           >
             {crewPieces.map((piece) => (
               <Image
