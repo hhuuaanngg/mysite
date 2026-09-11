@@ -47,34 +47,12 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-xl pt-8 lg:max-w-none lg:pt-4">
+        <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
           <Image
-            src="/illustrations/wave.png"
-            alt=""
-            width={220}
-            height={220}
-            priority
-            className="pointer-events-none absolute -top-2 right-2 z-10 w-[5.5rem] bob-slow sm:w-28 lg:-top-6 lg:right-4 lg:w-32"
-          />
-          <Image
-            src="/illustrations/plant.png"
-            alt=""
-            width={180}
-            height={180}
-            className="pointer-events-none absolute bottom-2 left-0 z-10 w-20 bob sm:w-24 lg:-left-4 lg:w-28"
-          />
-          <Image
-            src="/illustrations/laptop.png"
-            alt=""
-            width={200}
-            height={200}
-            className="pointer-events-none absolute -bottom-4 right-[18%] z-10 hidden w-24 bob-slow sm:block lg:w-28"
-          />
-          <Image
-            src="/illustrations/hero-crew.png"
-            alt="Notion 风格卡通人物：写代码、挥手打招呼、坐在便签上喝咖啡"
-            width={1536}
-            height={1024}
+            src="/illustrations/hero.png"
+            alt="Notion 风格卡通男生：黄毛衣，盘腿坐着写代码，一边挥手打招呼"
+            width={1600}
+            height={1200}
             priority
             className="relative z-0 w-full"
           />

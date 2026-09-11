@@ -16,9 +16,9 @@ export function About() {
         </div>
         <Image
           src="/illustrations/plant.png"
-          alt=""
-          width={320}
-          height={320}
+          alt="同一个卡通男生蹲着，捧着一盆绿植"
+          width={900}
+          height={900}
           className="mx-auto w-48 bob-slow sm:w-56 lg:w-full"
         />
       </div>

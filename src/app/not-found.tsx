@@ -12,9 +12,9 @@ export default function NotFound() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-5 py-16 text-center sm:px-8 sm:py-24">
       <Image
         src="/illustrations/lost.png"
-        alt=""
-        width={280}
-        height={280}
+        alt="同一个卡通男生坐在桌前，一脸困惑"
+        width={900}
+        height={900}
         className="w-44 sm:w-56"
       />
       <p className="mt-6 inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
