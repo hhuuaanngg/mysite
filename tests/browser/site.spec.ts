@@ -63,7 +63,7 @@ test("直接打开文章锚点、重复导航、手机菜单保持可用", async
   }
   await expect(articles.getByRole("button", { name: "2", exact: true })).toHaveAttribute("aria-current", "page");
   await expect(page.locator(".site-header")).toHaveCSS("--header-progress", "1");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
 });
 
 test("详情页、目录、原图和站内返回链接可用", async ({ page }) => {
@@ -71,7 +71,8 @@ test("详情页、目录、原图和站内返回链接可用", async ({ page }) 
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.locator("article h1").first()).toBeVisible();
-    const headingLinks = page.locator('aside a[href^="#"]');
+    const headingLinks = page.getByRole("navigation", { name: "目录", exact: true }).locator('a[href^="#"]');
+    if (path.includes("/work/")) expect(await headingLinks.count()).toBeGreaterThan(0);
     for (const href of await headingLinks.evaluateAll((links) => links.map((link) => link.getAttribute("href")!))) {
       expect(await page.evaluate((hash) => Boolean(document.getElementById(decodeURIComponent(hash.slice(1)))), href)).toBe(true);
     }
@@ -96,4 +97,21 @@ test("静态产物保留元数据、站点地图、图标和404", async ({ reque
   const missing = await request.get("/not-a-real-page/");
   expect(missing.status()).toBe(404);
   expect(await missing.text()).toContain("没有这页");
+});
+
+test("原生 Markdown 的表格、图片说明和手机正文布局保持可用", async ({ page }) => {
+  await page.goto("/work/frp3/");
+  const body = page.locator(".markdown-body");
+  await expect(body.locator("table").first()).toBeVisible();
+  await expect(body.locator("h2").first()).toHaveCSS("font-size", "12px");
+  const toc = page.getByRole("navigation", { name: "目录", exact: true });
+  expect(await toc.getByRole("link").count()).toBeGreaterThan(0);
+  await toc.getByRole("link").nth(1).click();
+  expect(await page.evaluate(() => Boolean(document.getElementById(decodeURIComponent(location.hash.slice(1)))))).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
+
+  await page.goto("/articles/manufacturing/");
+  await expect(page.locator(".markdown-body figure").first()).toBeVisible();
+  await expect(page.locator(".markdown-body figure img").first()).toHaveAttribute("width", "1200");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
 });

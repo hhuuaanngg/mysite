@@ -6,9 +6,15 @@ Astro version and relevant official documentation before changing framework APIs
 - Keep the existing Notion-style layout, fonts and original content assets.
 - Keep both Showcase tab panels mounted. Each list owns its page state; switching
   between works and articles must preserve both page numbers and displayed items.
-- Static JSX components render at build time. Only SiteHeader, Showcase and Contact
+- Static JSX and Astro components render at build time. Only SiteHeader, Showcase and Contact
   need client hydration. Content parsing and Markdown bodies stay build-only.
 - Markdown source files remain under `src/content/articles` and `src/content/works`.
+- Read content through `astro:content` collections; render bodies with `render()` and
+  `<Content />`. Frontmatter schemas live in `src/lib/content-schemas.ts`. Hydrated
+  components only receive metadata, never collection entries or full bodies.
+- `render()` headings are the TOC source. The official Unified Markdown processor
+  preserves existing anchors and presentation through `src/lib/markdown-plugins.mjs`;
+  keep image captions, tables, safe links and Shiki syntax highlighting build-only.
 - Use `npm run dev` for the website and local studio together (5680/5681), or Docker
   for 5780/5781. The wrappers supervise Astro directly so agent CLI auto-background
   behavior does not terminate the studio or orphan the browser test server.

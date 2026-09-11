@@ -5,10 +5,9 @@ import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
 import { Showcase } from "@/components/Showcase";
 import { getArticles } from "@/lib/articles";
-import { getProjectsInDisplayOrder } from "@/lib/projects";
+import { getProjects } from "@/lib/projects";
 
-const articles = getArticles();
-const projects = getProjectsInDisplayOrder();
+const [articles, projects] = await Promise.all([getArticles(), getProjects()]);
 ---
 <SiteLayout>
   <main>

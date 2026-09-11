@@ -1,0 +1,82 @@
+---
+import MarkdownBody from "./MarkdownBody.astro";
+import { ProjectCover } from "./ProjectCover";
+import { TableOfContents } from "./TableOfContents";
+import type { Project } from "@/lib/project-types";
+import type { TocItem } from "@/lib/markdown-toc";
+interface Props { project: Project; content: string; toc: TocItem[] }
+const { project, content, toc } = Astro.props;
+---
+<article class="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+  <p class="text-sm font-bold text-subtle">
+    <a href="/#work" class="hover:text-foreground">
+      ← 作品
+    </a>
+  </p>
+
+  <header class="mt-8 max-w-3xl">
+    <p class="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 text-xs font-extrabold tracking-wide">
+      {project.year}
+    </p>
+    <h1 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+      {project.title}
+    </h1>
+    <p class="mt-4 max-w-[65ch] text-lg leading-8 text-muted">
+      {project.summary}
+    </p>
+  </header>
+
+  <div class="mt-10 overflow-hidden rounded-3xl border border-border paper-shadow">
+    <ProjectCover project={project} size="hero" />
+  </div>
+
+  <div class="mt-12 grid gap-12 md:grid-cols-[minmax(0,1fr)_16rem]">
+    <MarkdownBody empty={!content.trim()} heading="pill" emptyMessage="这个项目介绍还在整理中。">
+      <slot />
+    </MarkdownBody>
+
+    <aside class="space-y-6">
+      <div class="h-fit rounded-3xl border border-border bg-card p-5 paper-shadow">
+        <h2 class="text-xs font-extrabold tracking-wide text-subtle uppercase">
+          链接与栈
+        </h2>
+        <ul class="mt-4 space-y-3 text-sm font-bold">
+          {project.repo ? (
+            <li>
+              <a
+                href={project.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-accent hover:underline"
+              >
+                GitHub ↗
+              </a>
+            </li>
+          ) : null}
+          {project.url ? (
+            <li>
+              <a
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-accent hover:underline"
+              >
+                线上 ↗
+              </a>
+            </li>
+          ) : null}
+        </ul>
+        <ul class="mt-6 flex flex-wrap gap-2">
+          {project.stack.map((tag) => (
+            <li
+              class="rounded-full border border-border bg-background px-2.5 py-0.5 font-mono text-[11px] text-subtle"
+            >
+              {tag}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <TableOfContents items={toc} />
+    </aside>
+  </div>
+</article>

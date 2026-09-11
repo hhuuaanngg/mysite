@@ -62,11 +62,23 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-`test:publishing` 使用临时内容执行真正的 Astro 构建，检查已发布正文、选中草稿和未选中草稿的隔离。浏览器测试使用 5690 端口，覆盖桌面和手机的独立分页保留、锚点导航、详情目录、图片、元数据和 404。
+`test:publishing` 使用临时内容执行真正的 Astro 构建，检查文章和作品的已发布正文、选中草稿与未选中草稿的隔离，并验证非法日期会阻止构建。浏览器测试使用 5690 端口，覆盖桌面和手机的独立分页保留、锚点导航、详情目录、图片、元数据和 404。
 
-`test:preview` 在预览服务运行期间执行发布构建，检查构建不会覆盖预览的 React 依赖缓存。Docker 更新后，还需运行 `SITE_TEST_ORIGIN=http://127.0.0.1:5780 npm run test:e2e` 检查实际运行页面，并在工坊生成网站后再次验证。
+`test:preview` 先验证工坊新建、修改、重命名和删除内容能被内容集合立即读取，再在预览服务运行期间执行发布构建，检查构建不会覆盖预览的 React 依赖缓存。Docker 更新后，还需运行 `SITE_TEST_ORIGIN=http://127.0.0.1:5780 npm run test:e2e` 检查实际运行页面，并在工坊生成网站后再次验证。
 
 迁移说明与验收记录：[Astro 7 迁移验收](docs/astro7-migration-acceptance.md)。
+
+## Astro 内容层
+
+文章和作品现在使用 **Content Collections + 原生 Markdown 渲染**：`src/content.config.ts` 定义两个集合，`getCollection()` 查询内容，详情页用 `render()` / `<Content />` 输出正文。字段校验和列表类型来自同一份 schema。
+
+现有 Markdown、图片目录和工坊操作方式保持不变。标题、分类、摘要等必填项缺失，文章日期无效，或作品排序、技术栈、配色不合法时，构建会指出有问题的文件和字段。年份仍支持“早期”等文字。
+
+正文支持标题与目录、图片说明、表格、任务列表，以及带语言名称的代码块高亮，例如三个反引号后填写 `ts`、`js`、`bash` 或 `toml`。高亮在构建时完成，访客不需要加载 Markdown 解析器。目录直接取自 Astro 渲染结果；原有标题锚点继续有效。
+
+使用 Astro 7 官方 Unified 处理器，以保留现有排版和锚点插件。未接入 MDX；普通文章继续写 `.md` 即可。工坊右侧的即时编辑预览仍使用原来的轻量预览器，最终站点排版和高亮请以「打开预览」为准。
+
+实施与验证：[Astro 内容集合验收](docs/astro-content-collections-acceptance.md)。
 
 ## 新增 / 编辑文章
 

@@ -168,3 +168,20 @@ body {
     animation: none;
   }
 }
+
+/* Native Markdown keeps the established work-heading and code-block surfaces. */
+.markdown-body[data-heading="pill"] h2 {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background-color: var(--yellow);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.025em;
+}
+
+.markdown-body pre.astro-code {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+}

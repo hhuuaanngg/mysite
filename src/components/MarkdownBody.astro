@@ -1,0 +1,13 @@
+---
+interface Props {
+  empty?: boolean;
+  heading?: "default" | "pill";
+  emptyMessage?: string;
+}
+const { empty = false, heading = "default", emptyMessage = "这篇文章还在整理中。" } = Astro.props;
+---
+{empty ? (
+  <p class="mt-10 max-w-[65ch] text-base leading-7 text-muted">{emptyMessage}</p>
+) : (
+  <div class="markdown-body min-w-0 space-y-6" data-heading={heading}><slot /></div>
+)}

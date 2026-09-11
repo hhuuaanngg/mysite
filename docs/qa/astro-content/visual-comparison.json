@@ -1,0 +1,124 @@
+{
+  "date": "2026-09-11",
+  "baseline": "5b4acc95 (Docker preview at 5780)",
+  "target": "Astro Content Collections + native Markdown (5680)",
+  "results": [
+    {
+      "name": "home",
+      "before": [
+        1440,
+        3088
+      ],
+      "after": [
+        1440,
+        3088
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "articles",
+      "before": [
+        1440,
+        2371
+      ],
+      "after": [
+        1440,
+        2371
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "work",
+      "before": [
+        1440,
+        2189
+      ],
+      "after": [
+        1440,
+        2189
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "article",
+      "before": [
+        1440,
+        2190
+      ],
+      "after": [
+        1440,
+        2190
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "mobile",
+      "before": [
+        390,
+        4104
+      ],
+      "after": [
+        390,
+        4104
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "mobile-articles",
+      "before": [
+        390,
+        3343
+      ],
+      "after": [
+        390,
+        3343
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "work-body",
+      "before": [
+        1440,
+        4734
+      ],
+      "after": [
+        1440,
+        4734
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    },
+    {
+      "name": "mobile-work",
+      "before": [
+        596,
+        5569
+      ],
+      "after": [
+        390,
+        6729
+      ],
+      "changedPixels": null,
+      "threshold": 0.15
+    },
+    {
+      "name": "mobile-gallery",
+      "before": [
+        390,
+        1364
+      ],
+      "after": [
+        390,
+        1364
+      ],
+      "changedPixels": 0,
+      "threshold": 0.15
+    }
+  ]
+}

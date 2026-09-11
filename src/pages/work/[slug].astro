@@ -1,15 +1,22 @@
 ---
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import SiteLayout from "@/layouts/SiteLayout.astro";
-import { WorkPage } from "@/components/WorkPage";
-import { getProject, getProjects } from "@/lib/projects";
+import WorkPage from "@/components/WorkPage.astro";
+import { toProject } from "@/lib/projects";
+import { toTableOfContents } from "@/lib/markdown-toc";
 
-export function getStaticPaths() {
-  return getProjects().map(({ slug }) => ({
-    params: { slug }, props: { project: getProject(slug)! },
+export async function getStaticPaths() {
+  return (await getCollection("works")).map((entry) => ({
+    params: { slug: entry.id }, props: { entry },
   }));
 }
-const { project } = Astro.props;
+interface Props { entry: CollectionEntry<"works"> }
+const { entry } = Astro.props;
+const project = toProject(entry);
+const { Content, headings } = await render(entry);
 ---
-<SiteLayout title={project.title} description={project.summary} type="article">
-  <WorkPage project={project} />
+<SiteLayout title={project.title} description={project.summary} image={project.cover.image}>
+  <WorkPage project={project} content={entry.body ?? ""} toc={toTableOfContents(headings)}>
+    <Content />
+  </WorkPage>
 </SiteLayout>

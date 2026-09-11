@@ -1,6 +1,8 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import tailwind from "@tailwindcss/vite";
+import { unified } from "@astrojs/markdown-remark";
+import { remarkSiteContent, rehypeSiteContent } from "./src/lib/markdown-plugins.mjs";
 
 const siteUrl = (process.env.SITE_URL || "https://hjy.me").replace(/\/$/, "");
 
@@ -10,6 +12,15 @@ export default defineConfig({
   outDir: "./out",
   trailingSlash: "always",
   integrations: [react()],
+  markdown: {
+    processor: unified({
+      smartypants: false,
+      remarkPlugins: [remarkSiteContent],
+      rehypePlugins: [rehypeSiteContent],
+    }),
+    syntaxHighlight: "shiki",
+    shikiConfig: { theme: "github-light", wrap: false },
+  },
   devToolbar: { enabled: false },
   server: {
     host: process.env.SITE_BIND_HOST || "127.0.0.1",

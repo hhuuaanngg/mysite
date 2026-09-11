@@ -1,0 +1,60 @@
+---
+import { SiteImage as Image } from "./SiteImage";
+import MarkdownBody from "./MarkdownBody.astro";
+import { ArticlePager } from "./ArticlePager";
+import { TableOfContents } from "./TableOfContents";
+import { markdownStartsWithImage } from "@/lib/markdown-images";
+import type { Article } from "@/lib/article-types";
+import type { TocItem } from "@/lib/markdown-toc";
+interface Props { article: Article; articles: Article[]; content: string; toc: TocItem[] }
+const { article, articles, content, toc } = Astro.props;
+const index = articles.findIndex((item) => item.slug === article.slug);
+const newer = index > 0 ? articles[index - 1] : undefined;
+const older = index >= 0 && index < articles.length - 1 ? articles[index + 1] : undefined;
+const formatDate = (value: string) => value.replaceAll("-", ".");
+---
+<article class="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+  <p class="text-sm font-bold text-subtle">
+    <a href="/#articles" class="hover:text-foreground">
+      ← 文章
+    </a>
+  </p>
+
+  <header class="mt-8">
+    <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+      <span class="inline-flex items-center rounded-full bg-yellow px-2.5 py-0.5 tracking-wide text-foreground">
+        {article.category}
+      </span>
+      <time class="font-mono text-subtle" datetime={article.date}>
+        {formatDate(article.date)}
+      </time>
+    </div>
+    <h1 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+      {article.title}
+    </h1>
+    <p class="mt-4 max-w-[65ch] text-lg leading-8 text-muted">
+      {article.summary}
+    </p>
+  </header>
+
+  {article.cover && !markdownStartsWithImage(content) ? (
+    <div class="relative mt-10 aspect-[16/9] max-w-3xl overflow-hidden rounded-3xl border border-border bg-card paper-shadow">
+      <Image
+        src={article.cover}
+        alt=""
+        fill
+        sizes="(min-width: 768px) 768px, 100vw"
+        className="object-cover"
+        priority
+      />
+    </div>
+  ) : null}
+
+  <div class={toc.length > 0 ? "mt-10 grid gap-12 md:grid-cols-[minmax(0,1fr)_16rem]" : "mt-10 max-w-3xl"}>
+    <div class="min-w-0">
+      <MarkdownBody empty={!content.trim()}><slot /></MarkdownBody>
+      <ArticlePager newer={newer} older={older} />
+    </div>
+    {toc.length > 0 && <TableOfContents items={toc} />}
+  </div>
+</article>

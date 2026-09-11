@@ -1,12 +1,4 @@
-export type Article = {
-  slug: string;
-  title: string;
-  date: string;
-  category: string;
-  summary: string;
-  cover: string;
-};
+import type { CollectionEntry } from "astro:content";
 
-export type ArticleDocument = Article & {
-  content: string;
-};
+// Type-only imports keep the content layer out of hydrated React islands.
+export type Article = CollectionEntry<"articles">["data"] & { slug: string };

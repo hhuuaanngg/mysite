@@ -6,6 +6,8 @@ import net from "node:net";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import test from "node:test";
+import { saveArticle, deleteArticleFiles } from "./article-store.mjs";
+import { saveWork, deleteWork } from "./work-store.mjs";
 import { buildRelease } from "./publisher.mjs";
 import { initializePublishing, snapshot } from "./publish-store.mjs";
 
@@ -46,12 +48,13 @@ test("publishing while preview is running must not replace its React development
     fs.rmSync(root, { recursive: true, force: true });
   });
   const origin = `http://127.0.0.1:${port}`;
-  async function get(url) {
+  async function get(url, includes = "", status = 200) {
     for (let attempt = 0; attempt < 100; attempt++) {
       if (child.exitCode !== null) throw new Error(logs);
       try {
         const response = await fetch(new URL(url, origin), { signal: AbortSignal.timeout(2000) });
-        if (response.ok) return await response.text();
+        const html = await response.text();
+        if (response.status === status && html.includes(includes)) return html;
       } catch { /* Wait for server startup/dependency optimization. */ }
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
@@ -63,6 +66,24 @@ test("publishing while preview is running must not replace its React development
   assert.ok(runtimeUrl, "preview should import the optimized JSX development runtime");
   const runtimeBefore = await get(runtimeUrl);
   assert.doesNotMatch(runtimeBefore, /exports\.jsxDEV\s*=\s*(?:void 0|undefined)/);
+
+  // Content collection watchers must see studio-created and edited Markdown.
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aIwoAAAAASUVORK5CYII=", "base64");
+  const articleInput = { title: "实时文章", slug: "live-collection", category: "生活", date: "2026-09-11", summary: "实时预览", body: "## LIVE_ARTICLE_CREATED", cover: { blob: "cover" } };
+  saveArticle(root, articleInput, new Map([["cover", { buffer: png, ext: ".png" }]]));
+  await get("/articles/live-collection/", "LIVE_ARTICLE_CREATED");
+  saveArticle(root, { ...articleInput, previousSlug: articleInput.slug, body: "## LIVE_ARTICLE_EDITED" }, new Map([["cover", { buffer: png, ext: ".png" }]]));
+  const updatedArticle = await get("/articles/live-collection/", "LIVE_ARTICLE_EDITED");
+  assert.ok(updatedArticle.includes('href="#live-article-edited"'));
+  assert.ok(!updatedArticle.includes("LIVE_ARTICLE_CREATED"));
+  const projectInput = { title: "实时作品", slug: "live-work", year: "2026", summary: "作品预览", stack: ["Astro"], body: "## LIVE_WORK_CREATED", cover: { mark: "A", palette: "mint" } };
+  saveWork(root, projectInput);
+  await get("/work/live-work/", "LIVE_WORK_CREATED");
+  saveWork(root, { ...projectInput, previousSlug: projectInput.slug, body: "## LIVE_WORK_EDITED" });
+  await get("/work/live-work/", "LIVE_WORK_EDITED");
+  saveWork(root, { ...projectInput, slug: "renamed-work", previousSlug: projectInput.slug, body: "## LIVE_WORK_RENAMED" });
+  await get("/work/renamed-work/", "LIVE_WORK_RENAMED");
+  await get("/work/live-work/", "", 404);
 
   initializePublishing(root);
   const source = path.join(root, ".studio/test-release/source");
@@ -76,4 +97,8 @@ test("publishing while preview is running must not replace its React development
   assert.equal(await get("/src/components/Showcase.tsx"), componentBefore);
   const html = await get("/");
   for (const title of ["精选项目", "作品分页", "社交媒体"]) assert.ok(html.includes(title));
+  deleteArticleFiles(root, "live-collection");
+  deleteWork(root, "renamed-work");
+  await get("/articles/live-collection/", "", 404);
+  await get("/work/renamed-work/", "", 404);
 });
