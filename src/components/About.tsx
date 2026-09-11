@@ -15,7 +15,7 @@ export function About() {
           </div>
         </div>
         <Image
-          src="/illustrations/plant.png"
+          src="/illustrations/wave.png"
           alt=""
           width={320}
           height={320}

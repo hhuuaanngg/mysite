@@ -2,6 +2,27 @@ import { SiteImage as Image } from "@/components/SiteImage";
 import { DoodleArrow, DoodleStar } from "@/components/Doodles";
 import { site } from "@/content/site";
 
+const CREW_W = 1536;
+const CREW_H = 1024;
+
+const crewPieces: {
+  src: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  z: number;
+  motion?: "bob" | "bob-slow";
+}[] = [
+  { src: "/illustrations/hero-star.png", x: 56, y: 223, w: 69, h: 68, z: 1 },
+  { src: "/illustrations/hero-notebook.png", x: 753, y: 871, w: 203, h: 107, z: 2 },
+  { src: "/illustrations/hero-code.png", x: 91, y: 379, w: 330, h: 496, z: 3 },
+  { src: "/illustrations/hero-stand.png", x: 626, y: 248, w: 333, h: 636, z: 4 },
+  { src: "/illustrations/hero-dog.png", x: 419, y: 523, w: 292, h: 374, z: 5, motion: "bob" },
+  { src: "/illustrations/hero-cat.png", x: 878, y: 620, w: 196, h: 261, z: 6, motion: "bob-slow" },
+  { src: "/illustrations/hero-coffee.png", x: 1091, y: 339, w: 325, h: 590, z: 7 },
+];
+
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
@@ -55,28 +76,30 @@ export function Hero() {
             priority
             className="pointer-events-none absolute -top-2 right-2 z-10 w-[5.5rem] bob-slow sm:w-28 lg:-top-6 lg:right-4 lg:w-32"
           />
-          <Image
-            src="/illustrations/plant.png"
-            alt=""
-            width={180}
-            height={180}
-            className="pointer-events-none absolute bottom-2 left-0 z-10 w-20 bob sm:w-24 lg:-left-4 lg:w-28"
-          />
-          <Image
-            src="/illustrations/laptop.png"
-            alt=""
-            width={200}
-            height={200}
-            className="pointer-events-none absolute -bottom-4 right-[18%] z-10 hidden w-24 bob-slow sm:block lg:w-28"
-          />
-          <Image
-            src="/illustrations/hero-crew.png"
-            alt="同一个 Notion 风格男生：写代码、挥手打招呼、坐在便签上喝咖啡，身边有金毛和金渐层猫咪"
-            width={1536}
-            height={1024}
-            priority
-            className="relative z-0 w-full"
-          />
+          <div
+            className="relative w-full"
+            style={{ aspectRatio: `${CREW_W} / ${CREW_H}` }}
+            role="img"
+            aria-label="同一个 Notion 风格男生：写代码、挥手打招呼、坐在便签上喝咖啡，身边有金毛和金渐层猫咪"
+          >
+            {crewPieces.map((piece) => (
+              <Image
+                key={piece.src}
+                src={piece.src}
+                alt=""
+                width={piece.w}
+                height={piece.h}
+                priority
+                className={`pointer-events-none absolute h-auto ${piece.motion ?? ""}`}
+                style={{
+                  left: `${(piece.x / CREW_W) * 100}%`,
+                  top: `${(piece.y / CREW_H) * 100}%`,
+                  width: `${(piece.w / CREW_W) * 100}%`,
+                  zIndex: piece.z,
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
