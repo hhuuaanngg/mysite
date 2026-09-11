@@ -1,0 +1,35 @@
+{
+  "name": "mysite",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:next": "next dev",
+    "studio": "node scripts/studio-server.mjs",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "new:article": "node scripts/new-article.mjs",
+    "test": "node --test scripts/article-store.test.mjs scripts/new-article.test.mjs scripts/studio/format.test.mjs scripts/ports.test.mjs"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.12",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
